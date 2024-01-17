@@ -108,11 +108,3 @@ $ python xml_parser.py -i 2011-2018 --mongo
 
 - https://aws.amazon.com/public-datasets/irs-990/ (Irs 990 Filings)
 - https://s3.amazonaws.com/irs-form-990/index_2011.json (Example of index.json)
-
-## [Mappping.csv](helpers/files/mapping.csv) maintenance
-
-Every year IRS launch new schema for the forms 990PF, 990, 990EZ and Schedules. When exist a new schema with xpaths generated from schema different to xpaths of mapping.csv only is necessary update mapping.csv with the new xpaths.
-
-## - Project for generate xpaths from schema
-
-- To be Added Soon
