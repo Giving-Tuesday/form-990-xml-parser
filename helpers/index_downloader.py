@@ -86,10 +86,11 @@ def fetch_filings_from_index_file(year):
         index_obj = json.load(file)
 
         # Step 3b. Gather the Filing name is going to be -> Filings2018
-        filling_name = list(index_obj.keys())[0]
+        #filling_name = list(index_obj.keys())[0]
         
         # Step 3c. generate an index list of dictionaries {u'OrganizationName': u'NEWPORT HARBOR BOOSTERS GIRLS LACROSSE PROGRAM', u'ObjectId': u'201820329349200102', u'URL': u'https://s3.amazonaws.com/irs-form-990/201820329349200102_public.xml', u'SubmittedOn': u'2018-03-01', u'DLN': u'93492032001028', u'LastUpdated': u'2018-03-14T23:04:38', u'TaxPeriod': u'201708', u'FormType': u'990EZ', u'EIN': u'455636537'}
-        index_list = index_obj.get(filling_name, [])
+        #index_list = index_obj.get(filling_name, [])
+        index_list = index_obj
 
         # Step 3d. Close the file i.e. finish writing
         file.close()
