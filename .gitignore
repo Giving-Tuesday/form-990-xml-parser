@@ -1,0 +1,8 @@
+helpers/indexes
+log-*
+*.log
+*.out
+*.pyc
+*.pickle
+settings.py
+env
