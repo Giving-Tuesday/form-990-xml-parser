@@ -63,6 +63,8 @@ def init(year):
     It then processes filings for that year and inserts them into mongodb. 
 
     '''
+    print ('year')
+    print (year)
 
     if '-t' in ARGS: 
         print ('Testing Connections')
@@ -277,7 +279,7 @@ if __name__ == '__main__':
 
             # Step 3a Set years to Years -> the range starting in 2011, until current year plus 1 because range function will stop 1 before
             #!  Not sure why we are using 2011 and not 2009 could be that we initially only have updated data for 2011 and beyond
-            YEARS = range(2011, datetime.now().year + 1)
+            YEARS = range(2000, datetime.now().year + 1)
 
             # Step 3b Initiate Pool
             POOL = Pool()
