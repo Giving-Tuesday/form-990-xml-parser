@@ -48,7 +48,7 @@ from helpers.helpers import check_new_xpaths
 from pymongo import MongoClient 
 
 # Import all variables that are hardcoded
-from settings.settings import mongo_qa_details, mongo_production_details
+from settings.Settings import mongo_qa_details, mongo_production_details
 
 # Sets base directory to where this script is located
 BASE_DIR = os.path.abspath(__file__)
@@ -69,17 +69,17 @@ def init(year):
 
         try: 
             print ('Testing Mongo QA/Local Connection')
-            mongodb_client = MongoClient(mongo_qa_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
+            mongodb_client = MongoClient(mongo_qa_details)
             print (mongodb_client.server_info())
         except Exception as e:
             print ('Mongo QA/Local Failed', e)
 
-        try: 
-            print ('Testing Mongo Production Connection')
-            mongodb_client = MongoClient(mongo_production_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
-            print (mongodb_client.server_info())
-        except Exception as e:
-            print ('Mongo Production Failed',e)
+        # try: 
+        #     print ('Testing Mongo Production Connection')
+        #     mongodb_client = MongoClient(mongo_production_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
+        #     print (mongodb_client.server_info())
+        # except Exception as e:
+        #     print ('Mongo Production Failed',e)
 
         sys.exit("Finished Testing Connections")
 
