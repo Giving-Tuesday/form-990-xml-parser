@@ -48,7 +48,7 @@ from helpers.helpers import check_new_xpaths
 from pymongo import MongoClient 
 
 # Import all variables that are hardcoded
-from .settings import mongo_qa_details, mongo_production_details
+from settings.settings import mongo_qa_details, mongo_production_details
 
 # Sets base directory to where this script is located
 BASE_DIR = os.path.abspath(__file__)
