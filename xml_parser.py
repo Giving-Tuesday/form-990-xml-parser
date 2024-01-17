@@ -224,18 +224,18 @@ if __name__ == '__main__':
         print ('Testing Connections')
 
         try: 
-            print ('Testing Mongo QA Connection')
-            mongodb_client = MongoClient(mongo_qa_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
+            print ('Testing Mongo QA/Local Connection')
+            mongodb_client = MongoClient(mongo_qa_details)
             print (mongodb_client.server_info())
         except Exception as e:
             print ('Mongo Failed', e)
 
-        try: 
-            print ('Testing Mongo Production Connection')
-            mongodb_client = MongoClient(mongo_production_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
-            print (mongodb_client.server_info())
-        except Exception as e:
-            print ('Mongo Production Failed',e)
+        # try: 
+        #     print ('Testing Mongo Production Connection')
+        #     mongodb_client = MongoClient(mongo_production_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
+        #     print (mongodb_client.server_info())
+        # except Exception as e:
+        #     print ('Mongo Production Failed',e)
 
         sys.exit("Finished Testing Connections")
 
