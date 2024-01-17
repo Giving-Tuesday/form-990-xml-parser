@@ -10,7 +10,6 @@ dnspython==2.2.1
 frozenlist==1.2.0
 idna==3.3
 idna-ssl==1.1.0
-lxml==3.8.0
 multidict==5.2.0
 pymongo==4.1.1
 requests==2.27.1
