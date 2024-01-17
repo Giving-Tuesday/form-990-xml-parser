@@ -3,7 +3,7 @@ import sys  # python library allows us to use sys values like from terminal
 import os  # python library allows us to use operating system commands like file system
 import csv  # allows us to open/close/write to CSV Files
 import re  # python library for regular expressions
-
+from ...settings import mongo_qa_details, mongo_production_details
 
 def csv_to_object():
     '''
@@ -279,8 +279,8 @@ def get_config(database):
 
     CONFIG = {
         'mongo': {
-            'prod': '',
-            'qa': 'mongodb://localhost/irs_xml'
+            'prod': mongo_production_details,
+            'qa': mongo_qa_details
         }
     }
 

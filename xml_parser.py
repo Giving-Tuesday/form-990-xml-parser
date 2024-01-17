@@ -47,6 +47,9 @@ from helpers.helpers import check_new_xpaths
 # Allow us to access Mongodb
 from pymongo import MongoClient 
 
+# Import all variables that are hardcoded
+from .settings import mongo_qa_details, mongo_production_details
+
 # Sets base directory to where this script is located
 BASE_DIR = os.path.abspath(__file__)
 
@@ -65,11 +68,18 @@ def init(year):
         print ('Testing Connections')
 
         try: 
-            print ('Testing Mongo Connection')
-            mongodb_client = MongoClient('mongodb://localhost/irs_xml',tls=True,tlsAllowInvalidCertificates=True,connect=False)
+            print ('Testing Mongo QA/Local Connection')
+            mongodb_client = MongoClient(mongo_qa_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
             print (mongodb_client.server_info())
-        except:
-            print ('Mongo Failed')
+        except Exception as e:
+            print ('Mongo QA/Local Failed', e)
+
+        try: 
+            print ('Testing Mongo Production Connection')
+            mongodb_client = MongoClient(mongo_production_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
+            print (mongodb_client.server_info())
+        except Exception as e:
+            print ('Mongo Production Failed',e)
 
         sys.exit("Finished Testing Connections")
 
@@ -214,11 +224,18 @@ if __name__ == '__main__':
         print ('Testing Connections')
 
         try: 
-            print ('Testing Mongo Connection')
-            mongodb_client = MongoClient('mongodb://localhost/irs_xml',tls=True,tlsAllowInvalidCertificates=True,connect=False)
+            print ('Testing Mongo QA Connection')
+            mongodb_client = MongoClient(mongo_qa_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
             print (mongodb_client.server_info())
-        except:
-            print ('Mongo Failed')
+        except Exception as e:
+            print ('Mongo Failed', e)
+
+        try: 
+            print ('Testing Mongo Production Connection')
+            mongodb_client = MongoClient(mongo_production_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
+            print (mongodb_client.server_info())
+        except Exception as e:
+            print ('Mongo Production Failed',e)
 
         sys.exit("Finished Testing Connections")
 

@@ -97,50 +97,12 @@ $ python xml_parser.py -i 2011-2018 --mongo
 - helpers/ helpers.py - Line 70 contains settings for Mongo
 - helpers/database/interface.py - Contains methods for dealing with Mongo
 
-## How errors are logged
+## Error Logging
 
 - General errors are also stored at nohup.out
-- Remember error logs are simply stored as .log files in the base level of Ca_XML_Data_Processing
+- Remember error logs are simply stored as .log files at the base level of IRS_XML_Parser
 - Creation of Logs handled following location: Line 130 & 183 of xml_parser.py
 - Mongo logging is handled following locations Lines: 89, 115, 122 of helpers/database/interface.py
-
-### Quick ways to search logs
-
-Step 1. SSH into Server password is in KEEWEB use new_server_root database and select parser as server
-
-```sh
-ssh root@68.183.21.23
-```
-
-Step 2. Navigate to Repo Ca_XML_Data_Processing -> Remember error logs are simply stored as .log files.
-
-```sh
-cd ca_xml_data_processing/
-```
-
-Step 3. Open which ever log you want to read
-
-```sh
-cd nano 2018.log
-```
-
-Step 4. The following will move the cursor directly to the bottom of the file
-
-```sh
-Ctrl + _
-```
-
-```sh
-Ctrl + V
-```
-
-Step 5. Use GREP to find errors
-
-```sh
-grep 'FAILED' <LOGFILE>
-```
-
-Step 6. Be sure to also check nohup.out
 
 # References
 
@@ -153,37 +115,4 @@ Every year IRS launch new schema for the forms 990PF, 990, 990EZ and Schedules. 
 
 ## - Project for generate xpaths from schema
 
-- https://github.com/CharityNavigator/990_metadata/
-
-## Update Mapping
-
-#### Steps:
-
-**Step 1.** Download the lastest schema from this page (https://www.irs.gov/pub/irs-schema/).
-
-**Step 2.** Extract the xpaths with this project (https://github.com/CharityNavigator/990_metadata/).
-
-- Clone the repository.
-- Put the new schema folder into folder named `schema`.
-  ![Alt text](images/Picture4.png "Folder Schema")
-- Create a folder with the name `output`.
-- On `python/extract.py` at line `318` configure the files of schema.
-  ![Alt text](images/Picture5.png "Configure TEGE")
-- Go to `python` folder and run `python extract.py` ("Tested on python 2.7.15").
-- That command will produce a file called `output/xpath_all.csv`.
-
-**Step 3.** Compare the new paths with the [mappping.csv](helpers/files/mapping.csv).
-
-- Put the `xpath_all.csv` file into the folder called `helpers/files/xpath_all.csv` in the project `ca_xml_data_processing` and run de command `python xml_parser.py -cm`.
-- That command will produce a file called `helpers/files/new_xpaths_report.csv` that contain all new xpath that not exist into the `mapping.csv`.
-- You can use any tools like Pandas (https://pandas.pydata.org/) or native csv python library for comparing if the new xpaths exist into [mappping.csv](helpers/files/mapping.csv).
-- Exist different approaches for compare:
-
-```
-  - Find by Xpath.
-  - Find by Line.
-```
-
-**Step 4.** Add new paths into the mapping.csv
-
-- If the path not exist, add a new line into the [mappping.csv](helpers/files/mapping.csv), the variable name can be create from xpath.
+- To be Added Soon
