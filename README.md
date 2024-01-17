@@ -53,43 +53,43 @@ Parser commands that can be passed from command line/terminal:
 - Insert 2018 data into mongo in production. Use python 2 and nohup means dont terminate process when we logout of ssh session.
 
 ```sh
-$ nohup python2 ./xml_parser.py -i 2018 --prod --mongodb
+$ nohup python3 ./xml_parser.py -i 2018 --prod --mongodb
 ```
 
 - Insert 2011 data into mongo in qa
 
 ```sh
-$ python xml_parser.py -i 2011 --mongodb --qa
+$ python3 xml_parser.py -i 2011 --mongodb --qa
 ```
 
 - Insert 2011 data into mongodb in qa. Insert only 100 documents at a time.
 
 ```sh
-$ python xml_parser.py -i 2011 -l 100 --mongodb --qa
+$ python3 xml_parser.py -i 2011 -l 100 --mongodb --qa
 ```
 
 - Insert 2011 into mongo db using force insert - by deleting and reinserting the data.
 
 ```sh
-$ python xml_parser.py -i 2011 -f --mongodb
+$ python3 xml_parser.py -i 2011 -f --mongodb
 ```
 
 - Insert 2011 data into mongo db continue from position 20 in the 2011 index.
 
 ```sh
-$ python xml_parser.py -i 2011 -c 20 --mongodb
+$ python3 xml_parser.py -i 2011 -c 20 --mongodb
 ```
 
 - Update forms.
 
 ```sh
-$ python xml_parser.py -u
+$ python3 xml_parser.py -u
 ```
 
 - Insert multiple years 2011 & 2018 into monogo.
 
 ```sh
-$ python xml_parser.py -i 2011-2018 --mongo
+$ python3 xml_parser.py -i 2011-2018 --mongo
 ```
 
 ## Communicating with Data Stores - i.e. Mongo

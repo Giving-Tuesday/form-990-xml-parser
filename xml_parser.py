@@ -63,8 +63,6 @@ def init(year):
     It then processes filings for that year and inserts them into mongodb. 
 
     '''
-    print ('year')
-    print (year)
 
     if '-t' in ARGS: 
         print ('Testing Connections')
