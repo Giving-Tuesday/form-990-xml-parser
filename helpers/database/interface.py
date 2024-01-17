@@ -13,7 +13,7 @@ SIZE_MAX_MONGO = 16777216  # Measured in Bytes max size of mongo document
 #mongodb_client_original = MongoClient(get_config('mongo'), connect=False) # get_config is a method that given arguments allows us to know which environment we are using i.e. production qa etc
 
 try:
-    mongodb_client = MongoClient(get_config('mongo'))
+    mongodb_client = MongoClient(get_config('mongo'),connect=False)
 except Exception as e:
     print ('Trying Different Connection', e)
     mongodb_client = MongoClient(get_config('mongo'),tls=True,tlsAllowInvalidCertificates=True,connect=False)
