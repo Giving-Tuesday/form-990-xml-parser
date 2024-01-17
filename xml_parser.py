@@ -2,9 +2,9 @@
     XML Parser Script 
     
     Goal: 
-    (1) Download all XML Filings hosted by Amazon Web Services for a given year (i.e. within an yearly index)
-    (2) Parse the XML and process xml data according to a mapping of variables and paths
-    (3) Store resulting data into Mongo DB
+    (1) Download all XML Filings hosted by Giving Tuesday
+    (2) Parse each XML file and process the xml data according to a mapping of variables and paths
+    (3) Store resulting data into Mongo DB (a non relational document store)
 
     Parser commands that can be passed from command line/terminal: 
     -i {Year}       Inserting command with year  
@@ -16,8 +16,8 @@
     --qa            Specifies the environment QA            - Local Test Environment
     --prod          Specifies the environment PRODUCTION    - AWS Production Environment
     
-    Command line often run as follows: nohup python2 ./xml_parser.py -i 2018 --prod --mongodb
-    In this example: we are using python 2 to run the parser with -i insert flag for 2018 into 
+    Command line often run as follows: nohup python3 ./xml_parser.py -i 2018 --prod --mongodb
+    In this example: we are using python 3 to run the parser with -i insert flag for 2018 into 
     
     Note: We can pass more than 1 year via console. 
 
