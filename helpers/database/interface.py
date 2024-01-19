@@ -10,15 +10,25 @@ import os #lets us use console
 SIZE_MAX_MONGO = 16777216  # Measured in Bytes max size of mongo document
 
 
-#mongodb_client_original = MongoClient(get_config('mongo'), connect=False) # get_config is a method that given arguments allows us to know which environment we are using i.e. production qa etc
-
+## Connect To Mongo
 try:
+    # Step 1 Try Connecting To Mongo notice TLS is disabeled as are certs
+    print ("Connecting to Mongo")
     mongodb_client = MongoClient(get_config('mongo'),connect=False)
-except Exception as e:
-    print ('Trying Different Connection', e)
-    mongodb_client = MongoClient(get_config('mongo'),tls=True,tlsAllowInvalidCertificates=True,connect=False)
+except:
+    print ('Trying Different Connection Approach')
+    try:
+        # Step 2 Try Connecting To Mongo with TLS, Certs, etc
+        mongodb_client = MongoClient(get_config('mongo'),tls=True,tlsAllowInvalidCertificates=True,connect=False)
+    except Exception as g
+        print ("Failed to connect to Mongo")
+        logging.info("Failed to connect to Mongo", g)
+
+## Select/Set Appropriate Database 
 
 mongo_database = mongodb_client['irs_xml'] # name of mongo database
+
+## Select Appropriate Schedules Collection Details
 schedules_collection = mongo_database['schedules'] # mongo collection that holds schedules
 schedules_collection_b = GridFS(mongo_database, 'schedulesb') # mongo collection that holds schedules larger than 16mb
 

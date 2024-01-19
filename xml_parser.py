@@ -298,8 +298,7 @@ if __name__ == '__main__':
 
             # Step 2a2b. If only 1 index name has been passed then we wont run it in parallel because the document insertion already happens as parallel batches.
             elif len(indices) == 1:
-                # Then we just need to intiate the init (i.e. main function) and pass the argument of index_name
-                # I.e. w will perform this serially
+                # Then we just need to intiate the init function (i.e. main function) and pass the argument of index_name
 
                 # Step 2a2b1 # Setup a list of processes that we want to run
                 PROCESS = Process(target=init, args=(indices[0],))
