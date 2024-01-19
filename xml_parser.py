@@ -7,7 +7,7 @@
     (3) Store resulting data into Mongo DB (a non relational document store)
 
     Parser commands that can be passed from command line/terminal: 
-    -i {Year}       Inserting command with year  
+    -i {Year}       Inserting command with index_name  
     -f              When processing removes and insert forms versus just inserting    
     -l {Number}     Number of forms that will be inserted simultaneously 1000
     -c {Number}     Location from an index where you want to continue inserting/processing 
@@ -19,7 +19,7 @@
     Command line often run as follows: nohup python3 ./xml_parser.py -i 2018 --prod --mongodb
     In this example: we are using python 3 to run the parser with -i insert flag for 2018 into 
     
-    Note: We can pass more than 1 year via console. 
+    Note: We can pass more than 1 index_name via console. 
 
 '''
 
@@ -32,7 +32,7 @@ from datetime import datetime  # allows us to figure out what current date is et
 from multiprocessing import Process, Pool
 # Allows us to update an index i.e. process an index for latest filings
 from helpers.index_downloader import fetch_filings_updated
-# Given a year Downloads an index from aws and creates a list of filings
+# Given a index_name Downloads an index from aws and creates a list of filings
 from helpers.index_downloader import fetch_filings_from_index_file
 # Parser is what we use to parse xml
 from helpers.parser.formparser import FormParser
@@ -57,10 +57,10 @@ BASE_DIR = os.path.abspath(__file__)
 ARGS = sys.argv[1:]
 
 
-def init(year):
+def init(index_name):
     '''
-    This is our main function which takes a year from console along with other consle arguments
-    It then processes filings for that year and inserts them into mongodb. 
+    This is our main function which takes a index_name from console along with other consle arguments
+    It then processes filings for that index_name and inserts them into mongodb. 
 
     '''
 
@@ -74,12 +74,12 @@ def init(year):
         except Exception as e:
             print ('Mongo QA/Local Failed', e)
 
-        # try: 
-        #     print ('Testing Mongo Production Connection')
-        #     mongodb_client = MongoClient(mongo_production_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
-        #     print (mongodb_client.server_info())
-        # except Exception as e:
-        #     print ('Mongo Production Failed',e)
+        try: 
+            print ('Testing Mongo Production Connection')
+            mongodb_client = MongoClient(mongo_production_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
+            print (mongodb_client.server_info())
+        except Exception as e:
+            print ('Mongo Production Failed',e)
 
         sys.exit("Finished Testing Connections")
 
@@ -103,15 +103,15 @@ def init(year):
             form_parser = FormParser(CSV_OBJECT, CSV_TABLE_OBJECT)
 
             # Step 3a2. Grab latest version of index by using fetch_filings method from index_downloader.py script
-            filings_updated = fetch_filings_updated(year)
+            filings_updated = fetch_filings_updated(index_name)
             # Uncomment line below (and comment line above) to run test with simple filing
             # filings_updated = [{u'OrganizationName': u'JAWONIO RESIDENTIAL OPPORTUNITIES III INC', u'ObjectId': u'201803129349301355', u'URL': u'https://s3.amazonaws.com/irs-form-990/201803129349301355_public.xml', u'SubmittedOn': u'2018-12-03', u'DLN': u'93493312013558', u'LastUpdated': u'2019-02-21T16:25:33', u'TaxPeriod': u'201712', u'FormType': u'990', u'EIN': u'201078564'}]#, {u'OrganizationName': u'ROAD RUNNERS CLUB OF AMERICA 1174 PACE SETTERS RUNNING CLUB INC', u'ObjectId': u'201803269349300500', u'URL': u'https://s3.amazonaws.com/irs-form-990/201803269349300500_public.xml', u'SubmittedOn': u'2018-12-19', u'DLN': u'93493326005008', u'LastUpdated': u'2019-02-21T16:25:33', u'TaxPeriod': u'201712', u'FormType': u'990', u'EIN': u'391455942'}, {u'OrganizationName': u'UNITED HOMES FUND INC CO FLUSHING HOUSE', u'ObjectId': u'201803129349201105', u'URL': u'https://s3.amazonaws.com/irs-form-990/201803129349201105_public.xml', u'SubmittedOn': u'2018-12-03', u'DLN': u'93492312011058', u'LastUpdated': u'2019-02-21T16:25:33', u'TaxPeriod': u'201712', u'FormType': u'990EZ', u'EIN': u'112808943'}, {u'OrganizationName': u'HOUGHTON VOLUNTEER AMBULANCE SERVICE INC', u'ObjectId': u'201803119349201075', u'URL': u'https://s3.amazonaws.com/irs-form-990/201803119349201075_public.xml', u'SubmittedOn': u'2018-12-03', u'DLN': u'93492311010758', u'LastUpdated': u'2019-02-21T16:25:33', u'TaxPeriod': u'201712', u'FormType': u'990EZ', u'EIN': u'262980099'}, {u'OrganizationName': u'VALLEY MEMORIAL FOUNDATION', u'ObjectId': u'201803119349301280', u'URL': u'https://s3.amazonaws.com/irs-form-990/201803119349301280_public.xml', u'SubmittedOn': u'2018-11-30', u'DLN': u'93493311012808', u'LastUpdated': u'2019-02-21T16:25:33', u'TaxPeriod': u'201806', u'FormType': u'990', u'EIN': u'450392710'}, {u'OrganizationName': u'PLUMBERS AND STEAMFITTERS PROTECTIVE ASSOCIATION INC', u'ObjectId': u'201803119349302560', u'URL': u'https://s3.amazonaws.com/irs-form-990/201803119349302560_public.xml', u'SubmittedOn': u'2018-12-03', u'DLN': u'93493311025608', u'LastUpdated': u'2019-02-21T16:25:33', u'TaxPeriod': u'201712', u'FormType': u'990', u'EIN': u'526038675'}]
-            # Gets a yearly index 'say 2018 index'
+            # Gets an index 'i.e 2018 index'
             # (1) Removes  current index called 2018
             # (2) Downloads latest version of index 2018
-            #    (2a) downloads latest index for a year
+            #    (2a) downloads latest index for a index_name
             #    (2b) if path doesnt exist creates it and creates file
-            # (3) Call function: fetch_filings_from_index_file(year
+            # (3) Call function: fetch_filings_from_index_file(index_name)
             #    (3a) Downloads latest version of index 2018
             #    (3b) Creates a list of dictionaries of all filings for that index
             # (4) Stores Yesterday's Date as difference between today and 1 day
@@ -148,23 +148,23 @@ def init(year):
             continue_progress = int((re.search("'-c', '([0-9]+)'",str(sys.argv)) or re.search("(0)", "0")).group(1)) - 2 
             print ('initial step %s' % continue_progress)
 
-            stop_progress = int((re.search("'-s', '([0-9]+)'",str(sys.argv)) or (len(fetch_filings_from_index_file(year)) - 1)))
+            stop_progress = int((re.search("'-s', '([0-9]+)'",str(sys.argv)) or (len(fetch_filings_from_index_file(index_name)) - 1)))
             #print ('number of files to process  %s' % stop_progress)
             end_process = continue_progress + stop_progress
 
             # print ('end process %s' %end_process)
 
             # Step 3b3. Build a list of filings fetch all filings from index and slice using continue_progress
-            filings = fetch_filings_from_index_file(year)[continue_progress:end_process]
+            filings = fetch_filings_from_index_file(index_name)[continue_progress:end_process]
     
         else:
             continue_progress = 0
 
-            filings = fetch_filings_from_index_file(year)
+            filings = fetch_filings_from_index_file(index_name)
 
-            # Step 3b4. Creates a log for year we are currently processing
+            # Step 3b4. Creates a log for index_name we are currently processing
             logging.basicConfig(
-                filename=str.format('log-{0}.log', year),
+                filename=str.format('log-{0}.log', index_name),
                 format='%(levelname)s: TIME: %(asctime)s MESSAGE: %(message)s',
                 level=logging.INFO
             )
@@ -230,43 +230,44 @@ if __name__ == '__main__':
         except Exception as e:
             print ('Mongo Failed', e)
 
-        # try: 
-        #     print ('Testing Mongo Production Connection')
-        #     mongodb_client = MongoClient(mongo_production_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
-        #     print (mongodb_client.server_info())
-        # except Exception as e:
-        #     print ('Mongo Production Failed',e)
+        try: 
+            print ('Testing Mongo Production Connection')
+            mongodb_client = MongoClient(mongo_production_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
+            print (mongodb_client.server_info())
+        except Exception as e:
+            print ('Mongo Production Failed',e)
 
         sys.exit("Finished Testing Connections")
 
     else:
             
         # Step 2a. Check to see if -i has been passed (i.e. inserting) as argument from console
-        if '-i' in ARGS:
+        if '-i' in ARGS: #2023-11-19
 
-            # Step 3a. Check to see how many years we are trying to insert for example
-            YEARS = sorted(list(set(re.search(
-                "'-i', '(([0-9]{4})|([0-9]{4}-[0-9]{4}))'",
-                str(sys.argv)).group(1).split('-'))))
+            # Step 3a. Check to see which index we are grabbing from data lake either "all_years + date or latest_only + date"
 
-            # Step 3b.  If more than 1 year has been requested to be inserted
-            if len(YEARS) == 2:  # maybe this should be >= 2 vs 2 not sure.
+            indices = [re.search(
+                "(?:'-i', ').(latest_only_[0-9]{4}-[0-9]{2}-[0-9]{2})'|(all_years_[0-9]{4}-[0-9]{2}-[0-9]{2})|(latest_only_[0-9]{4}-[0-9]{2}-[0-9]{2})", 
+                str(sys.argv)).group(0)]
+
+            # Step 3b.  If more than 1 index name has been requested to be inserted
+            if len(indices) == 2:  # maybe this should be >= 2 vs 2 not sure.
                 # Step 3b1. Instantiate a pool -> you can learn more about this ->https://www.ellicium.com/python-multiprocessing-pool-process/ and here https://sebastianraschka.com/Articles/2014_multiprocessing.html
                 POOL = Pool()
 
                 # Step 3b2.
                 # we are essentially passing the function init into Pool so
                 # it can run in separate cores and then we are saying
-                # if years = [2018,2017] pass 2017, and 2018 into init one for each pool
-                POOL.map(init, range(int(YEARS[0]), int(YEARS[1]) + 1))
+                # if indexes are = [2018,2017] pass 2017, and 2018 into init one for each pool i.e. run in parallel
+                POOL.map(init, indices) # old approach -> range(int(indices[0]), int(indices[1]+1))
 
-            # Step 3c. If only 1 year has been passed.
-            elif len(YEARS) == 1:
-                # Then we just need to intiate the init (i.e. main function) and pass the argument of years
+            # Step 3c. If only 1 index name has been passed.
+            elif len(indices) == 1:
+                # Then we just need to intiate the init (i.e. main function) and pass the argument of index_name
                 # I.e. w will perform this serially
 
                 # Step 3c1 # Setup a list of processes that we want to run
-                PROCESS = Process(target=init, args=(int(YEARS[0]),))
+                PROCESS = Process(target=init, args=(indices[0],))
                 # Step 3c2 # Run processes
                 PROCESS.start()
                 # Step 3c3 # Exit the completed processes
@@ -275,12 +276,12 @@ if __name__ == '__main__':
         # Step 2b. If -u is passed i.e. updating vs inserting
         elif '-u' in ARGS:
 
-            # Step 3a Set years to Years -> the range starting in 2011, until current year plus 1 because range function will stop 1 before
+            # Step 3a Set name to names -> the range starting in 2011, until current name plus 1 because range function will stop 1 before
             #!  Not sure why we are using 2011 and not 2009 could be that we initially only have updated data for 2011 and beyond
-            YEARS = range(2000, datetime.now().year + 1)
+            indices = range(2000, datetime.now().year + 1)
 
             # Step 3b Initiate Pool
             POOL = Pool()
 
             # Step 3c Pass init function and use core for each year
-            POOL.map(init, YEARS)
+            POOL.map(init, indices)

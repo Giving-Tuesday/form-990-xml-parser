@@ -21,8 +21,7 @@ def csv_to_object():
 
     # Step 3. Create a list of rows (for each row in csv) row will be a dictionary
     rows = csv.reader(file.readlines())
-    print ('helpers.py')
-    print (rows)
+
     # Step 4. For each row in list of rows
     for row in rows:
         # a row will look like this ['F9-PF-07-SUBREPARP', 'Subject to the section 4960 tax on remuneration or excess parachute payments?', 'IRS990PF-PART-07B-LINE-08', 'Return/ReturnData/IRS990PF/StatementsRegardingActy4720Grp/SubjToTaxRmnrtnExPrchtPymtInd', '2018v3.1',

@@ -1,83 +1,107 @@
 import os # allows us to use operating system functions
 import json # allows us to parse and store json
+import logging # allows us to log events
 #import urllib2 # allows us to handle urls - requests etc
 from urllib.request import urlopen
 from datetime import datetime, timedelta # allows us to figure out what date we are on and calculate a difference in dates
+import requests
+
 
 ROOT_DIR = os.path.join(os.path.dirname(__file__))
 INDEXES_DIR = os.path.join(ROOT_DIR, 'indexes') # directory that contains indices 
 
 
-def download_index(year):
+def download_index(index_name):
 
     '''
 
-    This method will download an index containing links to filings hosted on aws. 
-    This method takes a year i.e. 2018 
+    This method will download a json index containing links to filings hosted on the giving tuesday aws data lake. 
+    This method takes a index_name i.e. 2018-12-31 
 
 
     '''
+    x,y,url_date =(index_name.split("_"))
+    url_type = x+'_'+y
 
-    # Step 1. Set url index based on year. 
-    url_index = 'https://s3.amazonaws.com/irs-form-990/index_{0}.json'
-
+    # Step 1. Set url index based on index_name. 
+    url_index = 'https://gt990datalake-rawdata.s3.amazonaws.com/Indices/990xmls/index_{0}_efiledata_xmls_created_on_{1}.json'
+    full_url = str.format(url_index, url_type, url_date)
+    
     # Step 2. Check to see if indexpath exists
     if not os.path.exists(INDEXES_DIR):
         # Step 2a. If index path doesnt exist create it
         os.makedirs(INDEXES_DIR)
-    # Step 3. new file path will be index directory/year.json
-    new_file_path = os.path.join(
-        INDEXES_DIR,
-        str.format('{0}.json', year)
-    )
-    # Step 3. Check to see if file exists
+    
+    # Step 3. new file path will be index directory/index_name.json
+    new_file_path = os.path.join( INDEXES_DIR,str.format('{0}.json', index_name))
+    
+    # Step 4. Check to see if file exists
     if not os.path.isfile(new_file_path):
 
-        # Step 3a. If file path doesnt exist print to console that you are downloading the index from amazon. 
-        ## ! Could be a good thing to log
-        print (str.format('Downloading index {0} from amazon.', year))
+        # Step 4a. If file path doesnt exist print to console that you are downloading the index from amazon. 
+        print (str.format('Downloading & saving index {0} from amazon.', index_name))
+        logging.info(str.format('Downloading & saving index {0} from amazon.', index_name))
 
-        #Step 3b. Store the downloaded index as "response"
-        respose = urlopen(str.format(url_index, year))
+        try:
 
-        # Step 3c. Create a new file with downloaded index. Set file to 0 to avoid memory issues. 
-        with open(new_file_path, 'w+') as file:
-            file.write(respose.readline())
-            file.close()
-            respose = None
+            #Step 4b. Store the downloaded index as "response"  
+            response = requests.get(full_url, stream=True,verify=False)
 
-def remove_index(year):
+            # Step 4c. Create a new file with downloaded index. 
+            with open(new_file_path, mode="wb") as file:
+                for chunk in response.iter_content(chunk_size=10 * 1024):
+                    file.write(chunk)
+                # Close file that was just created/downloaded.
+                file.close()
+
+            # Step 4d Set file to 0 to avoid memory issues. 
+            response = None
+
+        except Exception as g:
+            print(str.format( "Failed To Download Index: {0} Giving Tuesday AWS: {1} Error was: {2}", index_name, full_url, g ))
+            logging.info(str.format( "Failed To Download Index: {0} Giving Tuesday AWS: {1} Error was: {2}", index_name, full_url, g ))
+
+    else:
+        print (str.format('Index: {0} Already Exists Locally No Need to Download', index_name))
+
+
+def remove_index(index_name):
 
     '''
 
-    This method removes an index from the hard drive. 
-    This method takes a year as the indexes are store as such 2019.json
+    This method removes an index from the local hard drive/storage. 
+    This method takes a index_name as the indexes are store as such 2019-12-31.json
 
     '''
 
-    # Step 1. Create a path given base index directory & year -> indexes/2018.json
-    path = os.path.join(INDEXES_DIR, str(year)+'.json')
+    # Step 1. Create a path given base index directory & index_name -> indexes/2018.json
+    path = os.path.join(INDEXES_DIR, str(index_name)+'.json')
 
     # Step 2. Check if the path exists. If patth exists means file exists
     if os.path.exists(path):
+        
         # Step 3. Remove the path -> i.e. remove the file. 
-        os.remove(path)
+        try:
+            os.remove(path)
+            logging.info(str.format( "Successfully Removed Index: {0}", index_name ))
+        except Exception as g:
+            logging.info(str.format( "Failed To Remove Index: {0} from Mongo: Error was: {1}", index_name, g ))
+ 
 
-
-def fetch_filings_from_index_file(year):
+def fetch_filings_from_index_file(index_name):
 
     '''
 
     This method downloads an index and then creates a list of filings from the index file. 
-    This method takes year -> i.e. 2018
+    This method takes index_name -> i.e. 2018
 
     '''
 
-    # Step 1: Download Index Call the download_index method and pass year
-    #download_index(year)
+    # Step 1: Download Index Call the download_index method and pass index_name
+    download_index(index_name)
 
-    # Step 2. Create a file path for year we are processing. 
-    file_path = str.format('{0}.json', year)
+    # Step 2. Create a file path for index_name we are processing. 
+    file_path = str.format('{0}.json', index_name)
 
     # Step 3. open index file
     with open(os.path.join(INDEXES_DIR, file_path)) as file:
@@ -85,11 +109,11 @@ def fetch_filings_from_index_file(year):
         #Step 3a. Load the file as json object
         index_obj = json.load(file)
 
-        # Step 3b. Gather the Filing name is going to be -> Filings2018
+        # Step 3b. Gather the Filing name is going to be -> Filings2018  -> This is no longer used because the old main key was removed
         #filling_name = list(index_obj.keys())[0]
         
         # Step 3c. generate an index list of dictionaries {u'OrganizationName': u'NEWPORT HARBOR BOOSTERS GIRLS LACROSSE PROGRAM', u'ObjectId': u'201820329349200102', u'URL': u'https://s3.amazonaws.com/irs-form-990/201820329349200102_public.xml', u'SubmittedOn': u'2018-03-01', u'DLN': u'93492032001028', u'LastUpdated': u'2018-03-14T23:04:38', u'TaxPeriod': u'201708', u'FormType': u'990EZ', u'EIN': u'455636537'}
-        #index_list = index_obj.get(filling_name, [])
+        #index_list = index_obj.get(filling_name, []) ---> No Longer Used Already is a list of dictionaries
         index_list = index_obj
 
         # Step 3d. Close the file i.e. finish writing
@@ -99,28 +123,28 @@ def fetch_filings_from_index_file(year):
         index_obj = None 
 
         # Step 3f. return the list of dictionaries
-        return index_list # return the index list
+        return index_list 
 
 
-def fetch_filings_updated(year):
+def fetch_filings_updated(index_name):
     '''
 
-    This method takes a year i.e. "2018" and updates the index
+    This method takes a index_name i.e. "2018.json" and updates the index
 
     '''
 
     # Step 1. Removes prior existing version of index 
-    remove_index(year)
+    remove_index(index_name)
 
     # Step 2. Redownloads the index
-    download_index(year)
+    download_index(index_name)
 
     # Step 3. Downloads latest index and create a list of dictionaries of all filings for that index
-    filings = fetch_filings_from_index_file(year)
+    filings = fetch_filings_from_index_file(index_name)
 
     # Step 4.  Stores Yesterday's Date as difference between today and 1 day That is to say 1 day ago. 
     # Example if today is 2019-10-16 15:53:25.393400 yesterday will be 2019-10-15 15:53:25.393400
-    yasterday = datetime.now() - timedelta(days=1)
+    yesterday = datetime.now() - timedelta(days=1)
  
     # Step 5.  Each object in list of dictionaries contains a last field u'LastUpdated': u'2018-03-14T23:04:38'
     #          We only want to select those where the lastupdate is greater than yesterday i.e this means its a new filing
@@ -130,5 +154,5 @@ def fetch_filings_updated(year):
     return filter(
         (lambda x: datetime.strptime(
             x['LastUpdated'][0:10],
-            '%Y-%m-%d') > yasterday), filings
+            '%Y-%m-%d') > yesterday), filings
     )

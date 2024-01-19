@@ -23,7 +23,6 @@ class FormFactory (object):
         This matters because different form types get inserted in different locations in Mongo
 
         '''
-
         
         # Step 1a. Check to see if the return type is 990
         if (self.all_data.get('RETURNTYPE') == '990'):

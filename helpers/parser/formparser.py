@@ -230,35 +230,32 @@ class FormParser (object):
             # Step 2d. Grab & Store EIN
             if variable_name == 'FILEREIN':
                 meta['FILEREIN'] = object_parsed[var_key]
-            ##! Would be good to put the filing type here -> that would help us narrow down collection we need later. 
-            ##! Would be good to put 501c Type here -> This would require a call to postgres
-            ##! Would be good to put the NTEE Code -> this would require a call to postgres
-            # Step 2d. Grab & Store Tax Period Beginning Date
+            # Step 2e. Grab & Store Tax Period Beginning Date
             if variable_name == 'TAXPERBEGIN':
                 meta['TAXPERBEGIN'] = object_parsed[var_key]
-            # Step 2e. Grab & Store Tax Ending Date
+            # Step 2f. Grab & Store Tax Ending Date
             if variable_name == 'TAXPEREND':
                 meta['TAXPEREND'] = object_parsed[var_key] 
-            # Step 2f  Grab & Store Taxyear
+            # Step 2g  Grab & Store Taxyear
             if variable_name == 'TAXYEAR':
                 meta['TAXYEAR'] = object_parsed[var_key]
-            # Step 2g. Grab & Store Filername
+            # Step 2h. Grab & Store Filername
             if variable_name == 'FILERNAME1':
                 meta['FILERNAME1'] = object_parsed[var_key]
-            # Step 2h. Grab & Store Street Address
+            # Step 2i. Grab & Store Street Address
             if variable_name == 'FILERUS1':
                 meta['FILERUS1'] = object_parsed[var_key]
-            # Step 2i Grab and store city
+            # Step 2j Grab and store city
             if variable_name == 'ADDRESCITYIT':
                 meta['ADDRESCITYIT'] = object_parsed[var_key]
-            # Step 2j Grab and store state
+            # Step 2k1 Grab and store state
             if variable_name == 'ADDRESSTATET':
                 meta['ADDRESSTATET'] = object_parsed[var_key]
-            # Step 2k Grab and store zipcode
+            # Step 2k2 Grab and store zipcode
             if variable_name == 'ADZIIPPCCOOD':
                 meta['ADZIIPPCCOOD'] = object_parsed[var_key]
 
-            # Step 2l as long as the schedule is not of type F9 because thsi means  its main form 
+            # Step 2l as long as the schedule is not of type F9 because this means its main form 
             if type_schedule != 'F9': 
 
                 # Step 2l1 Appends an object into a list if the object is in the schedules container and has a key value pair where type = schedule type
@@ -270,17 +267,26 @@ class FormParser (object):
                     # Step 2l2a append to schdules container a dictionary with variable name: value and type
                     schedules.append({
                         variable_name: object_parsed[var_key],
-                        'type': type_schedule
+                        'type': type_schedule,
+                        'FILEREIN':meta['FILEREIN'],
+                        'FILERNAME1':meta['FILERNAME1'],
+                        'TAXYEAR':meta['TAXYEAR'],
+                        'TAXPERBEGIN':meta['TAXPERBEGIN'],
+                        'TAXPEREND':meta['TAXPEREND']
                     })
                 
                 # Step 2l3 update schedules filtered
-                else: #  variable position 0 which is a dictinoary and add additional key value pair as it belongs in schedule
+                else: #  variable position 0 which is a dictionary and add additional key value pair as it belongs in schedule
                     schedules_filtered[0].update({
                         variable_name: object_parsed[var_key],
-                        'type': type_schedule
+                        'type': type_schedule,
+                        'FILEREIN':meta['FILEREIN'],
+                        'FILERNAME1':meta['FILERNAME1'],
+                        'TAXYEAR':meta['TAXYEAR'],
+                        'TAXPERBEGIN':meta['TAXPERBEGIN'],
+                        'TAXPEREND':meta['TAXPEREND']
                     })
 
-        # print (meta)
         # Step 3. Return schedules i.e. list of dictionaries = each dictionary is a schedule with schedule contents
         return schedules 
 
