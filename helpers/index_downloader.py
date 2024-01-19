@@ -129,7 +129,10 @@ def fetch_filings_from_index_file(index_name):
 def fetch_filings_updated(index_name):
     '''
 
-    This method takes a index_name i.e. "2018.json" and updates the index
+    # NOTE!!!  This method is currently inoperable until last_updated field is properly fixed in index in datalake. 
+    The Last_Updated field was in the original IRS Indices but now we make our own and dont have it. 
+
+    This method takes a index_name i.e. "2018.json" and updates the index meaning it will try to download index incase it has changed
 
     '''
 

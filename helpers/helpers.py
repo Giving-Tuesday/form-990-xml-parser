@@ -1,9 +1,8 @@
-
 import sys  # python library allows us to use sys values like from terminal
 import os  # python library allows us to use operating system commands like file system
 import csv  # allows us to open/close/write to CSV Files
 import re  # python library for regular expressions
-from settings.Settings import mongo_qa_details, mongo_production_details
+from settings.Settings import mongo_qa_details, mongo_production_details, mapping_main_file, mapping_table_file
 
 def csv_to_object():
     '''
@@ -17,7 +16,7 @@ def csv_to_object():
     csv_object = {}
 
     # Step 2. Open the mapping csv file in read only mode -  Path will be helpers/files/mapping.csv
-    file = open(os.path.join('helpers', 'files', 'mapping.csv'), 'r')
+    file = open(mapping_main_file, 'r')
 
     # Step 3. Create a list of rows (for each row in csv) row will be a dictionary
     rows = csv.reader(file.readlines())
@@ -48,7 +47,7 @@ def csv_table_to_object():
     csv_object = {}
 
     # Step 2. Open Mapping_Table.csv in read only mode -  Path will be helpers/files/mapping.csv
-    file = open(os.path.join('helpers', 'files', 'mapping_table.csv'), 'r')
+    file = open(mapping_table_file, 'r')
 
     # Step 3. Create a list of dictionaries represents rows of csv file
     rows = csv.reader(file.readlines())
@@ -79,10 +78,22 @@ def get_location_form_part(original_part_line, form_type):
     converted_part_line = ''
     # Dictionary that contain roman numbers for translating to ordinary number
     roman_number = {
-        'I': '01', 'II': '02', 'III': '03', 'IV': '04',
-        'V': '05', 'VI': '06', 'VII': '07', 'VIII': '08', 'IX': '09',
-        'X': '10', 'XI': '11', 'XII': '12', 'XIII': '13', 'XIV': '14',
-        'XV': '15', 'XVI': '16'
+        'I'   : '01', 
+        'II'  : '02', 
+        'III' : '03', 
+        'IV'  : '04',
+        'V'   : '05', 
+        'VI'  : '06', 
+        'VII' : '07', 
+        'VIII': '08', 
+        'IX'  : '09',
+        'X'   : '10', 
+        'XI'  : '11', 
+        'XII' : '12', 
+        'XIII': '13', 
+        'XIV' : '14',
+        'XV'  : '15', 
+        'XVI' : '16'
     }
     # @TODO add more patterns
     # Patterns of form part line
@@ -131,130 +142,49 @@ def get_form_type(source):
     '''
 
     return {
-        'IRS990': 'F990-PC',
-        'IRS990PF': 'F990-PF',
-        'IRS990EZ': 'F990-EZ',
-        'IRS990ScheduleA': 'SCHED-A',
-        'IRS990ScheduleB': 'SCHED-B',
-        'IRS990ScheduleC': 'SCHED-C',
-        'IRS990ScheduleD': 'SCHED-D',
-        'IRS990ScheduleE': 'SCHED-E',
-        'IRS990ScheduleF': 'SCHED-F',
-        'IRS990ScheduleG': 'SCHED-G',
-        'IRS990ScheduleH': 'SCHED-H',
-        'IRS990ScheduleI': 'SCHED-I',
-        'IRS990ScheduleJ': 'SCHED-J',
-        'IRS990ScheduleK': 'SCHED-K',
-        'IRS990ScheduleL': 'SCHED-L',
-        'IRS990ScheduleM': 'SCHED-M',
-        'IRS990ScheduleN': 'SCHED-N',
-        'IRS990ScheduleO': 'SCHED-O',
-        'IRS990ScheduleP': 'SCHED-P',
-        'IRS990ScheduleQ': 'SCHED-Q',
-        'IRS990ScheduleR': 'SCHED-R',
-        'AccountingFeesSchedule': 'SCHED-PF',
+        'IRS990'                                   : 'F990-PC',
+        'IRS990EZ'                                 : 'F990-EZ',
+        'IRS990PF'                                 : 'F990-PF',
+        'IRS990ScheduleA'                          : 'SCHED-A',
+        'IRS990ScheduleB'                          : 'SCHED-B',
+        'IRS990ScheduleC'                          : 'SCHED-C',
+        'IRS990ScheduleD'                          : 'SCHED-D',
+        'IRS990ScheduleE'                          : 'SCHED-E',
+        'IRS990ScheduleF'                          : 'SCHED-F',
+        'IRS990ScheduleG'                          : 'SCHED-G',
+        'IRS990ScheduleH'                          : 'SCHED-H',
+        'IRS990ScheduleI'                          : 'SCHED-I',
+        'IRS990ScheduleJ'                          : 'SCHED-J',
+        'IRS990ScheduleK'                          : 'SCHED-K',
+        'IRS990ScheduleL'                          : 'SCHED-L',
+        'IRS990ScheduleM'                          : 'SCHED-M',
+        'IRS990ScheduleN'                          : 'SCHED-N',
+        'IRS990ScheduleO'                          : 'SCHED-O',
+        'IRS990ScheduleP'                          : 'SCHED-P',
+        'IRS990ScheduleQ'                          : 'SCHED-Q',
+        'IRS990ScheduleR'                          : 'SCHED-R',
+        'AccountingFeesSchedule'                   : 'SCHED-PF',
         'AllOtherProgramRelatedInvestmentsSchedule': 'SCHED-PF',
-        'AmortizationSchedule': 'SCHED-PF',
-        'DepreciationSchedule': 'SCHED-PF',
-        'GainLossFromSaleOtherAssetsSchedule': 'SCHED-PF',
-        'InvestmentsCorpBondsSchedule': 'SCHED-PF',
-        'InvestmentsCorpStockSchedule': 'SCHED-PF',
-        'InvestmentsGovtObligationsSchedule': 'SCHED-PF',
-        'InvestmentsLandSchedule2': 'SCHED-PF',
-        'InvestmentsOtherSchedule2': 'SCHED-PF',
-        'LandEtcSchedule2': 'SCHED-PF',
-        'LegalFeesSchedule': 'SCHED-PF',
-        'OtherAssetsSchedule': 'SCHED-PF',
-        'OtherDecreasesSchedule': 'SCHED-PF',
-        'OtherExpensesSchedule': 'SCHED-PF',
-        'OtherIncomeSchedule2': 'SCHED-PF',
-        'OtherIncreasesSchedule': 'SCHED-PF',
-        'OtherLiabilitiesSchedule': 'SCHED-PF',
-        'TaxesSchedule': 'SCHED-PF',
-        'ReductionExplanationStatement': 'SCHED-PF',
-        'OtherProfessionalFeesSchedule': 'SCHED-PF'
+        'AmortizationSchedule'                     : 'SCHED-PF',
+        'DepreciationSchedule'                     : 'SCHED-PF',
+        'GainLossFromSaleOtherAssetsSchedule'      : 'SCHED-PF',
+        'InvestmentsCorpBondsSchedule'             : 'SCHED-PF',
+        'InvestmentsCorpStockSchedule'             : 'SCHED-PF',
+        'InvestmentsGovtObligationsSchedule'       : 'SCHED-PF',
+        'InvestmentsLandSchedule2'                 : 'SCHED-PF',
+        'InvestmentsOtherSchedule2'                : 'SCHED-PF',
+        'LandEtcSchedule2'                         : 'SCHED-PF',
+        'LegalFeesSchedule'                        : 'SCHED-PF',
+        'OtherAssetsSchedule'                      : 'SCHED-PF',
+        'OtherDecreasesSchedule'                   : 'SCHED-PF',
+        'OtherExpensesSchedule'                    : 'SCHED-PF',
+        'OtherIncomeSchedule2'                     : 'SCHED-PF',
+        'OtherIncreasesSchedule'                   : 'SCHED-PF',
+        'OtherLiabilitiesSchedule'                 : 'SCHED-PF',
+        'OtherProfessionalFeesSchedule'            : 'SCHED-PF',
+        'ReductionExplanationStatement'            : 'SCHED-PF',
+        'TaxesSchedule'                            : 'SCHED-PF'
     }.get(source, '')  # Type of form
-
-
-def check_new_xpaths():
-    '''
-        Check is there are new xpaths.
-        It will generete a report `called new_xpaths_report.csv` that 
-        contain all new xpath that not exist in `mapping.csv`.
-    '''
-    try:
-        # Report structure
-        reports = [("VARIABLE_NAME", "DESCRIPTION",
-                    "LOCATION", "XPATH", "EXIST?")]
-        # File path string of xpath_all.csv
-        xpath_all_path = os.path.join('helpers', 'files', 'xpath_all.csv')
-        # File path string of mapping.csv
-        mapping_path = os.path.join('helpers', 'files', 'mapping.csv')
-        # File path string of report
-        xpath_report_path = os.path.join(
-            'helpers', 'files', "new_xpaths_report.csv")
-
-        # Mapping file object
-        mapping_file = open(mapping_path, 'r')
-        # Xpath All file object
-        xpath_file = open(xpath_all_path, 'r')
-        # Report file object
-        xpath_report_file = open(xpath_report_path, 'w')
-        # Csv object used for creating a csv in disk
-        xpath_report_csv = csv.writer(xpath_report_file)
-        # Contain all rows of mapping.csv
-        mapping_lines = mapping_file.readlines()
-
-        # Contain all xpath from mapping
-        mapping_xpaths = map(lambda item: item[3],
-                             csv.reader(mapping_lines))
-        # Contain all location part line from mapping
-        mapping_parts = map(lambda item: item[2],
-                            csv.reader(mapping_lines))
-        # Contain all variable name from mapping
-        mapping_variable_names = map(lambda item: item[0],
-                                     csv.reader(mapping_lines))
-        # Contain all new xpath
-        new_xpaths = map(lambda item: (item[1], item[2], item[5], item[4]),
-                         csv.reader(xpath_file.readlines()))
-
-        # Ignore the first and remove duplicate rows.
-        for src, xpath, part, desc in list(set(new_xpaths[1:])):
-
-            if xpath not in mapping_xpaths:  # Checking if the new xpath exist into the mapping
-                # get the form type
-                form_type = get_form_type(src)
-                # get location form part the form
-                location_form_part = get_location_form_part(part, form_type)
-
-                # Checking if location of new xpath exist into the location list of mapping
-                if location_form_part in mapping_parts:
-                    # Note: In this case probably the xpath exist but with other structure.
-
-                    # Find the variable name from mapping
-                    variable_name = mapping_variable_names[mapping_parts.index(
-                        location_form_part)]
-                    # Add the new xpath to report
-                    reports.append(
-                        [variable_name, desc, location_form_part, xpath, "YES"])
-                else:
-                    # Note: In this case probably the xpath not exist into the mapping.
-
-                    # Add the new xpath to report
-                    reports.append(
-                        ["N/A", desc, location_form_part, xpath, "NO"])
-
-        # Save reports in disk
-        for row in reports:
-            xpath_report_csv.writerow(row)
-
-        # Release file resources
-        mapping_file.close()
-        xpath_file.close()
-        xpath_report_file.close()
-
-    except IOError as e:
-        print(e)
 
 
 def get_config(database):

@@ -2,7 +2,7 @@
 from urllib.request import urlopen
 import re # this allows us to use regular expressions in python
 from lxml import etree # this is an xml parsing library 
-
+import logging # allows us to store logs
 from helpers.factory.formfactory import FormFactory # library allows us to create forms
 
 
@@ -393,10 +393,10 @@ class FormParser (object):
             form = FormFactory(all_data, schedules).create()
 
         # Step 1b. If code cant be run throw an exception and print it to console
-        except Exception as e:
+        except Exception as g:
 
             # Step 1b1. Print Exception to console
-            print (e)
+            logging.info(str.format( "Issue parsing the following xml file: {0}.", xml_link, g ))
 
         # Step 2/9. Return the form that has been created back to whatever file called this method -> main_xml.py
         # Once the form is created and return, main can then store it or do other things with it.  

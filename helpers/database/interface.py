@@ -96,7 +96,7 @@ class MongoInterface (object):
         collectionb = GridFS(mongo_database, (self.form_type+'b')) # way to access collection by form type for documents larger than 16mb
 
         # Step 2. Log whats going on i.e ein we are processing 
-        logging.info(str.format("PROCESSING EIN: {0}",self.all_data.get("FILEREIN")))
+        logging.info(str.format("PROCESSING EIN: {0} & Inserting into Mongo",self.all_data.get("FILEREIN")))
         #print (str.format("PROCESSING EIN: {0}",self.all_data.get("FILEREIN")))
 
         # Step 3. Check to make sure the form doesn't already exist in Mongo if it does we pass because we are not interested in reinserting information
