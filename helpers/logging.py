@@ -4,8 +4,8 @@ import logging # Import Pythons Logging Library
 ########### Logging Details
 # We have 3 Logs
 # Access Log = Basically keeps track of time parser was activated and finished.
-# Progress Log = Keeps track of the script as it runs. But only exists for each independent session. I.e. its overwritten 
 # Error Log = Keeps track of any issues arising during the running of the parser. 
+# Progress Log = Keeps track of the script as it runs. But only exists for each independent session. I.e. its overwritten 
 
 # Log Locations - i.e. where things get saved to
 access_log_location = './logs/access.log' 
@@ -78,7 +78,7 @@ progress_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s -
 progress_file_handler.setFormatter(progress_formatter)
 logger_progress.addHandler(progress_file_handler)
 
-## Create custom access log function that we can import anywhere in the code base
+## Create custom progress log function that we can import anywhere in the code base
 def log_progress(e: Exception, message: str, detail: Log_Details):
     log = f"Script: {detail.script} - Message: {message}"
     logger_progress.info(log)

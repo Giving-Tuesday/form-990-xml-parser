@@ -5,9 +5,13 @@ from gridfs import GridFS               # library that allows us to store files 
 from bson import objectid               # way to handle bson objects for mongo
 from helpers.helpers import get_config  # a method that gets database details depending on arguments passed from the terminal when running xml parser script
 import pickle                           # file format for large python objects
-import os                               #lets us use console
+import os,sys                           #lets us use console and system
                                         #lets us import specific settings relating mostly to mongo
 from settings.Settings import mongo_max_document_size, mongo_database_name, schedules_reg_collection__name, schedules_large_collection_name
+from helpers.logging import Log_Details, log_error  # Import Custom Logging
+
+# Store name of current script in Log_Details class object as script name. We do this so that error log will always tell us which script error comes from. 
+Log_Details.script = os.path.split(sys.argv[0])[1]
 
 SIZE_MAX_MONGO = mongo_max_document_size # Max size is 16mb for regular documents otherwise we need to use GridFs to store docs in mongo
 
@@ -16,14 +20,17 @@ try:
     # Step 1 Try Connecting To Mongo notice TLS is disabeled as are certs
     print ("Connecting to Mongo")
     mongodb_client = MongoClient(get_config('mongo'),connect=False)
-except:
-    print ('Trying Different Connection Approach')
+
+except Exception as g:
+    print ('Initial Connection Failed Trying Different Connection Approach')
+    log_error(g, "Failed to connect to Mongo", Log_Details)
+
     try:
         # Step 2 Try Connecting To Mongo with TLS, Certs, etc
         mongodb_client = MongoClient(get_config('mongo'),tls=True,tlsAllowInvalidCertificates=True,connect=False)
-    except Exception as g:
+    except Exception as gg:
         print ("Failed to connect to Mongo")
-        logging.info("Failed to connect to Mongo", g)
+        log_error(gg, "Failed to connect to Mongo", Log_Details)
 
 ## Select/Set Appropriate Database in this case irs_xml = name of database
 mongo_database = mongodb_client[mongo_database_name] 

@@ -66,6 +66,8 @@ BASE_DIR = os.path.abspath(__file__)
 # store all arguments passed in from shell into a list starting with
 ARGS = sys.argv[1:]
 
+# Turn all args into string
+initial_args = ' '. join([str(arg) for arg in sys.argv[1:]])
 
 def init(index_name):
     '''
@@ -74,7 +76,7 @@ def init(index_name):
 
     '''
 
-    log_access('', 'Initiating ', Log_Details)
+    log_access('', 'Started Running The XML Parser with following arguments & flags: %s' % initial_args, Log_Details)
 
     # Step 1 - Check to see if -t in arguments that triggers a testing of database connections
     if '-t' in ARGS:  
@@ -243,6 +245,7 @@ def init(index_name):
                     # 3b7e. Log our progress to the console
                     print (progress)
 
+    log_access('', 'Finished Running XML Parser', Log_Details)
 
 # Step 1. If your program module is in main (folder) then it will execute the following. If script is called form outside of main then the lines below wont execute
 if __name__ == '__main__':
