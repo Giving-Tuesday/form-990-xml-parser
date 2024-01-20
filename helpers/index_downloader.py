@@ -5,10 +5,11 @@ import logging # allows us to log events
 from urllib.request import urlopen
 from datetime import datetime, timedelta # allows us to figure out what date we are on and calculate a difference in dates
 import requests
+from settings.Settings import indices_directory_name, gt_datalake_index_location
 
 
-ROOT_DIR = os.path.join(os.path.dirname(__file__))
-INDEXES_DIR = os.path.join(ROOT_DIR, 'indexes') # directory that contains indices 
+ROOT_DIR = os.path.join(os.path.dirname(__file__)) # Sets root to Helpers Directory
+INDEXES_DIR = os.path.join(ROOT_DIR, indices_directory_name) # adds "indices" to the helpers directory path
 
 
 def download_index(index_name):
@@ -16,15 +17,16 @@ def download_index(index_name):
     '''
 
     This method will download a json index containing links to filings hosted on the giving tuesday aws data lake. 
-    This method takes a index_name i.e. 2018-12-31 
-
-
+    This method takes a index_name i.e. latest_only_2018-12-31.json and download it from
+    https://gt990datalake-rawdata.s3.amazonaws.com/Indices/990xmls/index_latest_only_efiledata_xmls_created_on_2018-12-31.json
+   
     '''
+
     x,y,url_date =(index_name.split("_"))
     url_type = x+'_'+y
 
     # Step 1. Set url index based on index_name. 
-    url_index = 'https://gt990datalake-rawdata.s3.amazonaws.com/Indices/990xmls/index_{0}_efiledata_xmls_created_on_{1}.json'
+    url_index = gt_datalake_index_location
     full_url = str.format(url_index, url_type, url_date)
     
     # Step 2. Check to see if indexpath exists
@@ -103,28 +105,33 @@ def fetch_filings_from_index_file(index_name):
     # Step 2. Create a file path for index_name we are processing. 
     file_path = str.format('{0}.json', index_name)
 
-    # Step 3. open index file
-    with open(os.path.join(INDEXES_DIR, file_path)) as file:
+    try:
 
-        #Step 3a. Load the file as json object
-        index_obj = json.load(file)
+        # Step 3. open index file
+        with open(os.path.join(INDEXES_DIR, file_path)) as file:
 
-        # Step 3b. Gather the Filing name is going to be -> Filings2018  -> This is no longer used because the old main key was removed
-        #filling_name = list(index_obj.keys())[0]
-        
-        # Step 3c. generate an index list of dictionaries {u'OrganizationName': u'NEWPORT HARBOR BOOSTERS GIRLS LACROSSE PROGRAM', u'ObjectId': u'201820329349200102', u'URL': u'https://s3.amazonaws.com/irs-form-990/201820329349200102_public.xml', u'SubmittedOn': u'2018-03-01', u'DLN': u'93492032001028', u'LastUpdated': u'2018-03-14T23:04:38', u'TaxPeriod': u'201708', u'FormType': u'990EZ', u'EIN': u'455636537'}
-        #index_list = index_obj.get(filling_name, []) ---> No Longer Used Already is a list of dictionaries
-        index_list = index_obj
+            #Step 3a. Load the file as json object
+            index_obj = json.load(file)
 
-        # Step 3d. Close the file i.e. finish writing
-        file.close()
+            # Step 3b. Gather the Filing name is going to be -> Filings2018  -> This is no longer used because the old main key was removed
+            #filling_name = list(index_obj.keys())[0]
+            
+            # Step 3c. generate an index list of dictionaries {u'OrganizationName': u'NEWPORT HARBOR BOOSTERS GIRLS LACROSSE PROGRAM', u'ObjectId': u'201820329349200102', u'URL': u'https://s3.amazonaws.com/irs-form-990/201820329349200102_public.xml', u'SubmittedOn': u'2018-03-01', u'DLN': u'93492032001028', u'LastUpdated': u'2018-03-14T23:04:38', u'TaxPeriod': u'201708', u'FormType': u'990EZ', u'EIN': u'455636537'}
+            #index_list = index_obj.get(filling_name, []) ---> No Longer Used Already is a list of dictionaries
+            index_list = index_obj
 
-        # Step 3e. # Set inde_obj to 0 again to avoid memory issues
-        index_obj = None 
+            # Step 3d. Close the file i.e. finish writing
+            file.close()
 
-        # Step 3f. return the list of dictionaries
-        return index_list 
+            # Step 3e. # Set inde_obj to 0 again to avoid memory issues
+            index_obj = None 
 
+            # Step 3f. return the list of dictionaries
+            return index_list 
+
+    except Exception as g:
+        logging.info(str.format( "Failed To Fetch Filings From Index named: {0} error was: {1}", index_name, g ))
+        return None
 
 def fetch_filings_updated(index_name):
     '''

@@ -30,7 +30,6 @@
             -into production mongodb  
     
     Final Note: You can pass more than 1 index_name via console. 
-
 '''
 
 import sys  # python library allows us to use sys values like from terminal

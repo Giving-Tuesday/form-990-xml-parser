@@ -1,4 +1,4 @@
-#helpers/indexes/*.json
+#helpers/indices/*.json
 log-*
 *.log
 *.out

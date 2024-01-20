@@ -6,10 +6,9 @@ import logging # allows us to store logs
 from helpers.factory.formfactory import FormFactory # library allows us to create forms
 
 
-URL_IRS = '{http://www.irs.gov/efile}' # this is a tag present in all filings
-REGEXP_SCHEDULE_TYPE = '(.*)-(PF|EZ|PC)' # we use this to undestand what part of form or schedule we are dealing with
-REGEXP_TYPE = '(.*)-(.*)-(.*)' # we use this to remove initial un_necessary data and grab variable name: F9-PC-09-PENPLACONTOT becomes -> PENPLACONTOT
-
+URL_IRS = '{http://www.irs.gov/efile}'   # This is a tag present in all XML filings
+REGEXP_SCHEDULE_TYPE = '(.*)-(PF|EZ|PC)' # We use this to undestand what part of form or schedule we are dealing with
+REGEXP_TYPE = '(.*)-(.*)-(.*)'           # We use this to remove initial unesscessary data and grab variable name: F9-PC-09-PENPLACONTOT becomes -> PENPLACONTOT
 
 class FormParser (object):
 
@@ -358,7 +357,7 @@ class FormParser (object):
     def create(self, xml_link):
 
         '''
-        This method takes an xml_link i.e. location of a xml filing, downloads the filing, processes it and creates a form object which can tehn be inserted. 
+        This method takes an xml_link i.e. location of a xml filing, downloads the filing, processes it and creates a form object which can then be inserted. 
 
         '''
 

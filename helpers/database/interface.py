@@ -4,11 +4,12 @@ from pymongo import MongoClient         # library that lets us use mongo with py
 from gridfs import GridFS               # library that allows us to store files larger than 16mb into mongo 
 from bson import objectid               # way to handle bson objects for mongo
 from helpers.helpers import get_config  # a method that gets database details depending on arguments passed from the terminal when running xml parser script
-import pickle # file format for large python objects
-import os #lets us use console
+import pickle                           # file format for large python objects
+import os                               #lets us use console
+                                        #lets us import specific settings relating mostly to mongo
+from settings.Settings import mongo_max_document_size, mongo_database_name, schedules_reg_collection__name, schedules_large_collection_name
 
-SIZE_MAX_MONGO = 16777216  # Measured in Bytes max size of mongo document
-
+SIZE_MAX_MONGO = mongo_max_document_size # Max size is 16mb for regular documents otherwise we need to use GridFs to store docs in mongo
 
 ## Connect To Mongo
 try:
@@ -24,13 +25,12 @@ except:
         print ("Failed to connect to Mongo")
         logging.info("Failed to connect to Mongo", g)
 
-## Select/Set Appropriate Database 
-
-mongo_database = mongodb_client['irs_xml'] # name of mongo database
+## Select/Set Appropriate Database in this case irs_xml = name of database
+mongo_database = mongodb_client[mongo_database_name] 
 
 ## Select Appropriate Schedules Collection Details
-schedules_collection = mongo_database['schedules'] # mongo collection that holds schedules
-schedules_collection_b = GridFS(mongo_database, 'schedulesb') # mongo collection that holds schedules larger than 16mb
+schedules_collection = mongo_database[schedules_reg_collection__name]           # mongo collection that holds schedules
+schedules_collection_b = GridFS(mongo_database, schedules_large_collection_name) # mongo collection that holds schedules larger than 16mb
 
 
 class MongoInterface (object):
@@ -65,16 +65,17 @@ class MongoInterface (object):
         if nonprofit:
             # find all the relevant schedules for this document and delete them. Remember schedules are in separate collection than main document. 
             #print ("Removing Schedules Associated with Document")
-            schedules_collection.delete_many({
-                '_id': {'$in': nonprofit.get('schedules', [])}
-            })
-            #print (str.format("Deleting record for EIN: {0} TaxYear: {1} ", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR")))
-            logging.info(collection.delete_one({'_id': nonprofit.get('_id', 0)}))
-
+            try: 
+                schedules_collection.delete_many({
+                    '_id': {'$in': nonprofit.get('schedules', [])}
+                })
+                #print (str.format("Deleting record for EIN: {0} TaxYear: {1} ", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR")))
+                logging.info(collection.delete_one({'_id': nonprofit.get('_id', 0)}))
+            except Exception as g:
+                logging.info(str.format( "Unable to find or delete records for EIN: {0} TaxYear: {1}", self.all_data.get("FILEREIN"), self.all_data.get("TAXYEAR"),g ))
         else:
             #print (str.format("Record not found for EIN: {0} TaxYear: {1} ", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR")))
-            logging.info(str.format("Record not found for EIN: {0} TaxYear: {1} ", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR")))
-
+            logging.info(str.format("Record not found for EIN: {0}  TaxYear: {1} so could not remove. ", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR"), g))
     def __form_not_exists(self, collection):
 
         '''
@@ -181,9 +182,9 @@ class MongoInterface (object):
                     # Step 5. We log that insertion works
                     logging.info(str.format( "SUCCESSFULLY INSERTED MAIN FORM DATA FOR EIN: {0} into mongo gridfs",self.all_data.get("FILEREIN")))
                     #print (str.format( "SUCCESSFULLY INSERTED MAIN FORM DATA FOR EIN: {0} into mongo gridfs",self.all_data.get("FILEREIN")))
-                except Exception as h:
+                except Exception as g:
                     # If this fails we log it. 
-                    logging.info(str.format("FAILED TO INSERT MAIN FORM DATA FOR EIN: {0} into mongo gridfs. Error was: {1}", self.all_data.get("FILEREIN"), h))
+                    logging.info(str.format("FAILED TO INSERT MAIN FORM DATA FOR EIN: {0} into mongo gridfs. Error was: {1}", self.all_data.get("FILEREIN"), g))
                     #print (str.format("FAILED TO INSERT MAIN FORM DATA FOR EIN: {0} into mongo gridfs. Error was: {1}", self.all_data.get("FILEREIN"), h ))
             
             # Step 6. Removing Large Pickle Files That were created and inserted using GridFs    
@@ -192,7 +193,7 @@ class MongoInterface (object):
             #except:
             #    pass
         else:
-            logging.info(str.format( "FORM FOR EIN: {0} ALREADY EXISTS IN MONGO!", self.all_data.get("FILEREIN") ) )
+            logging.info(str.format( "FORM FOR EIN: {0} ALREADY EXISTS IN MONGO! Skipping", self.all_data.get("FILEREIN") ) )
             #print (str.format( "FORM FOR EIN: {0} ALREADY EXISTS IN MONGO!", self.all_data.get("FILEREIN")))
 
 
@@ -241,14 +242,19 @@ class MongoInterface (object):
             # Step 3a. Update Schedule Data
             # Call method _Update_Schedules passing the nonprofit_from_db data this is necessary so that we know 
             self.__update_schedules(nonprofit_from_db)
-            logging.info(str.format("Updaing Schedule Data for EIN: {0} Tax Year: {1}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR") ))
+
             # Step 3b. Update Main Form Data
             # Remember in our example collection = mongodb_client['irs_xml']['990PF'] 
-            collection.update_one(
-                {'_id': nonprofit_from_db.get('_id')}, # passing id so we can identify the proper document
-                {'$set': self.all_data}) # Passing all the document data
-             logging.info(str.format("Updaing Main Form Data for EIN: {0} Tax Year: {1}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR") ))
-
+            # uncomment if you want to log -> logging.info(str.format("Updating Main Form Data for EIN: {0} Tax Year: {1}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR") ))
+         
+            try: 
+                collection.update_one(
+                    {'_id': nonprofit_from_db.get('_id')}, # passing id so we can identify the proper document
+                    {'$set': self.all_data}) # Passing all the document data
+            
+            except Exception as g:
+                logging.info(str.format("Unable to Update Main Form Data for EIN: {0} Tax Year: {1}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR"), g))
+       
         else: 
             # This means we didn't find an existing document so actually the document needs to be inserted not updated. 
             # Step 4. Call the insert_data_into_mongo method
@@ -287,10 +293,15 @@ class MongoInterface (object):
             if schedule_filter:
                 # Connect to mongo mongo_database['schedules'] 
                 # Step 2b2a Update document using update_one mongo api https://docs.mongodb.com/manual/reference/method/db.collection.updateOne/
-                schedules_collection.update_one(
-                    {'_id': schedule_id},
-                    {'$set': schedule_filter[0]}) 
-                    # we pass schedule filter [0] because there should only be one match for the document given ein/tax year etc. 
-                    # Schedule_filter 0 at this point is the underlying schedule data
-                break
+                #uncomment if you want to log -> logging.info(str.format("Updating Schedule Data for EIN: {0} Tax Year: {1}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR") ))
+                try:
+                    schedules_collection.update_one(
+                        {'_id': schedule_id},
+                        {'$set': schedule_filter[0]}) 
+                        # we pass schedule filter [0] because there should only be one match for the document given ein/tax year etc. 
+                        # Schedule_filter 0 at this point is the underlying schedule data
+                    break
+                except Exception as g: 
+                    logging.info(str.format("Unable to Update Schedule Data for EIN: {0} Tax Year: {1} with Schedule Object Id Of: {2}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR"), schedule_id, g))
+
        
