@@ -21,7 +21,7 @@ except:
     try:
         # Step 2 Try Connecting To Mongo with TLS, Certs, etc
         mongodb_client = MongoClient(get_config('mongo'),tls=True,tlsAllowInvalidCertificates=True,connect=False)
-    except Exception as g
+    except Exception as g:
         print ("Failed to connect to Mongo")
         logging.info("Failed to connect to Mongo", g)
 

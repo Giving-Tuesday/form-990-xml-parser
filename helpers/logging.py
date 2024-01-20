@@ -8,9 +8,9 @@ import logging # Import Pythons Logging Library
 # Error Log = Keeps track of any issues arising during the running of the parser. 
 
 # Log Locations - i.e. where things get saved to
-access_log_location = '../logs/access.log' 
-error_log_location = '../logs/error.log' 
-progress_log_location = '../logs/progress.log' 
+access_log_location = './logs/access.log' 
+error_log_location = './logs/error.log' 
+progress_log_location = './logs/progress.log' 
 
 ## Create Simple Logging Classes that will create & store script as a variable. 
 
