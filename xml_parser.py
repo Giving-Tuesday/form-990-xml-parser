@@ -34,7 +34,6 @@
 
 import sys  # python library allows us to use sys values like from terminal
 import re  # allows us to use regular expressions
-import logging  # python library that allows us to log things
 import os  # allows us to use operating system functions
 from datetime import datetime  # allows us to figure out what current date is etc
 # allows us to parellelize the running of our code
@@ -53,9 +52,13 @@ from helpers.helpers import csv_table_to_object
 from helpers.helpers import partition_list
 # Allow us to access Mongodb
 from pymongo import MongoClient 
-
 # Import all variables that are hardcoded
 from settings.Settings import mongo_qa_details, mongo_production_details
+# Import Custom Logging
+from helpers.logging import Log_Details, log_access, log_error, log_progress
+
+# Store name of current script in Log_Details class object as script name. We do this so that error log will always tell us which script error comes from. 
+Log_Details.script = os.path.split(sys.argv[0])[1]
 
 # Sets base directory to where this script is located
 BASE_DIR = os.path.abspath(__file__)
@@ -71,6 +74,8 @@ def init(index_name):
 
     '''
 
+    log_access('', 'Initiating ', Log_Details)
+
     # Step 1 - Check to see if -t in arguments that triggers a testing of database connections
     if '-t' in ARGS:  
         print ('Testing Connections')
@@ -80,9 +85,10 @@ def init(index_name):
             print ('Testing Mongo QA/Local Connection')
             mongodb_client = MongoClient(mongo_qa_details)
             print (mongodb_client.server_info())
+
         except Exception as g:
             print ('Connection To Mongo QA/Local Failed', g)
-            logging.info('Connection To Mongo QA/Local Failed', g)
+            log_error(g, "Connection To Mongo QA/Local Failed", Log_Details) 
 
         # Step 3. Test Connection to Production Mongo Database
         try: 
@@ -90,8 +96,8 @@ def init(index_name):
             mongodb_client = MongoClient(mongo_production_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
             print (mongodb_client.server_info())
         except Exception as g:
-            print ('Mongo Production Failed',g)
-            logging.info('Connection To Mongo in Production Failed', g)
+            print ('Connection To Mongo Production Failed',g)
+            log_error(g, 'Connection To Mongo in Production Failed', Log_Details) 
 
         # Step 4. Terminate Script as we are only running tests
         sys.exit("Finished Testing Connections")
@@ -176,12 +182,12 @@ def init(index_name):
             # Step 3b5 # Fetch filings from index file 
             filings = fetch_filings_from_index_file(index_name)
 
-            # Step 3b6. Creates a log for index_name we are currently processing
-            logging.basicConfig(
-                filename=str.format('log-{0}.log', index_name),
-                format='%(levelname)s: TIME: %(asctime)s MESSAGE: %(message)s',
-                level=logging.INFO
-            )
+            # Step 3b6. Creates a log for index_name we are currently processing this is deprecated as we use our own logging.py 
+            # logging.basicConfig(
+            #     filename=str.format('log-{0}.log', index_name),
+            #     format='%(levelname)s: TIME: %(asctime)s MESSAGE: %(message)s',
+            #     level=logging.INFO
+            # )
 
             # Step 3b7. For each filing in the index, download, process index and store filing in mongodb 
             for index, xml_list in enumerate(partition_list(filings, limit)):
@@ -232,8 +238,8 @@ def init(index_name):
                     )
 
                     # 3b7d. Log Progress we keep this uncommented as we will already have details at document level (elsewhere in code)
-                    #logging.info(progress)  
-                    
+                    log_progress('', 'Parser Progress: %s Finished inserting: %s' % (progress, xml_link), Log_Details) # original logging -> #logging.info(progress) 
+
                     # 3b7e. Log our progress to the console
                     print (progress)
 
@@ -252,7 +258,7 @@ if __name__ == '__main__':
             print (mongodb_client.server_info())
         except Exception as g:
             print ('Connection To Mongo QA/Local Failed', g)
-            logging.info('Connection To Mongo QA/Local Failed', g)
+            log_error(g, "Connection To Mongo QA/Local Failed", Log_Details) 
 
         # Step 1c. Test Connection to Production Mongo Database
         try: 
@@ -260,8 +266,8 @@ if __name__ == '__main__':
             mongodb_client = MongoClient(mongo_production_details,tls=True,tlsAllowInvalidCertificates=True,connect=False)
             print (mongodb_client.server_info())
         except Exception as g:
-            print ('Mongo Production Failed',g)
-            logging.info('Connection To Mongo in Production Failed', g)
+            print ('Connection To Mongo Production Failed',g)
+            log_error(g, 'Connection To Mongo Production Failed', Log_Details) 
 
         # Step 1d. Terminate Script as we are only running tests
         sys.exit("Finished Testing Connections")

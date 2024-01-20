@@ -100,7 +100,7 @@ def fetch_filings_from_index_file(index_name):
     '''
 
     # Step 1: Download Index Call the download_index method and pass index_name
-    download_index(index_name)
+    #download_index(index_name)
 
     # Step 2. Create a file path for index_name we are processing. 
     file_path = str.format('{0}.json', index_name)
