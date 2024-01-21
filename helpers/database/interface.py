@@ -8,7 +8,7 @@ import pickle                           # file format for large python objects
 import os,sys                           #lets us use console and system
                                         #lets us import specific settings relating mostly to mongo
 from settings.Settings import mongo_max_document_size, mongo_database_name, schedules_reg_collection__name, schedules_large_collection_name
-from helpers.logging import Log_Details, log_error  # Import Custom Logging
+from helpers.loggingutil import Log_Details, log_error, log_progress  # Import Custom Logging
 
 # Store name of current script in Log_Details class object as script name. We do this so that error log will always tell us which script error comes from. 
 Log_Details.script = os.path.split(sys.argv[0])[1]
@@ -18,7 +18,7 @@ SIZE_MAX_MONGO = mongo_max_document_size # Max size is 16mb for regular document
 ## Connect To Mongo
 try:
     # Step 1 Try Connecting To Mongo notice TLS is disabeled as are certs
-    print ("Connecting to Mongo")
+    #print ("Connecting to Mongo")
     mongodb_client = MongoClient(get_config('mongo'),connect=False)
 
 except Exception as g:
@@ -77,12 +77,13 @@ class MongoInterface (object):
                     '_id': {'$in': nonprofit.get('schedules', [])}
                 })
                 #print (str.format("Deleting record for EIN: {0} TaxYear: {1} ", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR")))
-                logging.info(collection.delete_one({'_id': nonprofit.get('_id', 0)}))
+                log_progress('',collection.delete_one({'_id': nonprofit.get('_id', 0)}),Log_Details)
             except Exception as g:
-                logging.info(str.format( "Unable to find or delete records for EIN: {0} TaxYear: {1}", self.all_data.get("FILEREIN"), self.all_data.get("TAXYEAR"),g ))
+                log_error(g, str.format( "Unable to find or delete records for EIN: {0} TaxYear: {1}", self.all_data.get("FILEREIN"), self.all_data.get("TAXYEAR")),Log_Details)
         else:
             #print (str.format("Record not found for EIN: {0} TaxYear: {1} ", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR")))
-            logging.info(str.format("Record not found for EIN: {0}  TaxYear: {1} so could not remove. ", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR"), g))
+            log_error(g, str.format("Record not found for EIN: {0}  TaxYear: {1} so could not remove. ", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR")), Log_Details)
+    
     def __form_not_exists(self, collection):
 
         '''
@@ -93,12 +94,17 @@ class MongoInterface (object):
 
         # Step 1 is to use the collection name to find 1 document using find_one mongo api -> https://docs.mongodb.com/manual/reference/method/db.collection.findOne/
         # We use two criteria EIN & TAXYEAR as that ensures that we have singled out only 1 document. If we just used EIN we would get more than one
-        nonprofit = collection.find_one({
-            'FILEREIN': self.all_data['FILEREIN'],
-            'TAXYEAR': self.all_data['TAXYEAR']
-        })
-        # Step 2 if the search results in nothing then we return None
-        return nonprofit is None
+        try: 
+            nonprofit = collection.find_one({
+                'FILEREIN': self.all_data['FILEREIN'],
+                'TAXYEAR': self.all_data['TAXYEAR']
+            })
+
+            # Step 2 if the search results in nothing then we return None
+            return nonprofit is None
+
+        except Exception as g:
+            log_error(g, "Failed to check if form does not exist", Log_Details)
 
     def insert_data_to_mongo(self):
 
@@ -114,7 +120,7 @@ class MongoInterface (object):
         collectionb = GridFS(mongo_database, (self.form_type+'b')) # way to access collection by form type for documents larger than 16mb
 
         # Step 2. Log whats going on i.e ein we are processing 
-        logging.info(str.format("PROCESSING EIN: {0} & Inserting into Mongo",self.all_data.get("FILEREIN")))
+        log_progress('',str.format("PROCESSING EIN: {0} & Inserting into Mongo",self.all_data.get("FILEREIN")), Log_Details)
         #print (str.format("PROCESSING EIN: {0}",self.all_data.get("FILEREIN")))
 
         # Step 3. Check to make sure the form doesn't already exist in Mongo if it does we pass because we are not interested in reinserting information
@@ -134,7 +140,7 @@ class MongoInterface (object):
                     # Step 3a3 Now that we have inserted the schedule data into mongo -> we just insert the id's for each schedule into the main form 
                     # remember all_data is the dictionary with the main form -> so now it contains a field called ['schedules'] with identifiers for each schedule that goes with that form 
                     self.all_data['schedules'] = schedules_ids
-                    logging.info(str.format( "SUCCESSFULLY INSERTED SCHEDULE DATA FOR EIN: {0} into mongo", self.all_data.get("FILEREIN")))
+                    log_progress('',str.format( "SUCCESSFULLY INSERTED SCHEDULE DATA FOR EIN: {0} into mongo", self.all_data.get("FILEREIN")),Log_Details)
                     #print (str.format( "SUCCESSFULLY INSERTED SCHEDULE DATA FOR EIN: {0} into mongo", self.all_data.get("FILEREIN")))
 
                 except:
@@ -158,11 +164,11 @@ class MongoInterface (object):
                                 schedules_inserted.append(nam)
                         # add list of schedules inserted into schedules
                         self.all_data['schedules'] = schedules_inserted
-                        logging.info(str.format( "SUCCESSFULLY INSERTED SCHEDULE DATA FOR EIN: {0} into mongo gridfs list of ids{1}", self.all_data.get("FILEREIN"),self.all_data.get("schedules")))
+                        log_progress('',str.format( "SUCCESSFULLY INSERTED SCHEDULE DATA FOR EIN: {0} into mongo gridfs list of ids{1}", self.all_data.get("FILEREIN"),self.all_data.get("schedules")),Log_Details)
                         #print (str.format( "SUCCESSFULLY INSERTED SCHEDULE DATA FOR EIN: {0} into mongo gridfs list of ids{1}", self.all_data.get("FILEREIN"),self.all_data.get("schedules")))
                     except Exception as g: 
                         # If this fails then we log it
-                        logging.info(str.format( "FAILED TO INSERT SCHEDULE DATA FOR EIN: {0} into mongo gridfs. Error was: {1}", self.all_data.get("FILEREIN"), g ))
+                        log_error(g, str.format( "FAILED TO INSERT SCHEDULE DATA FOR EIN: {0} into mongo gridfs. Error was: {1}", self.all_data.get("FILEREIN")),Log_Details)
                         #print (str.format( "FAILED TO INSERT SCHEDULE DATA FOR EIN: {0} into mongogridfs. Error was: {1}", self.all_data.get("FILEREIN"), g ))
 
             # we take the main form type in our example 990PF -> insert the main form data by calling the mongo insert_one method docs ->  https://docs.mongodb.com/manual/reference/method/db.collection.insertOne/
@@ -172,7 +178,7 @@ class MongoInterface (object):
                 collection.insert_one(self.all_data)
                 
                 # Step 5. We log that insertion works
-                logging.info(str.format( "SUCCESSFULLY INSERTED MAIN FORM DATA FOR EIN: {0} into mongo",self.all_data.get("FILEREIN")))
+                log_progress('',str.format( "SUCCESSFULLY INSERTED MAIN FORM DATA FOR EIN: {0} into mongo",self.all_data.get("FILEREIN")),Log_Details)
                 #print (str.format( "SUCCESSFULLY INSERTED MAIN FORM DATA FOR EIN: {0} into mongo",self.all_data.get("FILEREIN")))
 
             except:
@@ -187,11 +193,11 @@ class MongoInterface (object):
                         # Try to insert pickle file using gridfs
                         collectionb.put(zz, content_type='pickle', filename=filenm2, year=self.all_data.get('TAXYEAR'), state=self.all_data.get('FILERUSSTATE'), FILEREIN=self.all_data.get("FILEREIN"), filing_type=self.form_type)
                     # Step 5. We log that insertion works
-                    logging.info(str.format( "SUCCESSFULLY INSERTED MAIN FORM DATA FOR EIN: {0} into mongo gridfs",self.all_data.get("FILEREIN")))
+                    log_progress('',str.format( "SUCCESSFULLY INSERTED MAIN FORM DATA FOR EIN: {0} into mongo gridfs",self.all_data.get("FILEREIN")),Log_Details)
                     #print (str.format( "SUCCESSFULLY INSERTED MAIN FORM DATA FOR EIN: {0} into mongo gridfs",self.all_data.get("FILEREIN")))
                 except Exception as g:
                     # If this fails we log it. 
-                    logging.info(str.format("FAILED TO INSERT MAIN FORM DATA FOR EIN: {0} into mongo gridfs. Error was: {1}", self.all_data.get("FILEREIN"), g))
+                    log_error(g,str.format("FAILED TO INSERT MAIN FORM DATA FOR EIN: {0} into mongo gridfs. Error was: {1}", self.all_data.get("FILEREIN")),Log_Details)
                     #print (str.format("FAILED TO INSERT MAIN FORM DATA FOR EIN: {0} into mongo gridfs. Error was: {1}", self.all_data.get("FILEREIN"), h ))
             
             # Step 6. Removing Large Pickle Files That were created and inserted using GridFs    
@@ -200,7 +206,7 @@ class MongoInterface (object):
             #except:
             #    pass
         else:
-            logging.info(str.format( "FORM FOR EIN: {0} ALREADY EXISTS IN MONGO! Skipping", self.all_data.get("FILEREIN") ) )
+            log_progress('',str.format( "FORM FOR EIN: {0} ALREADY EXISTS IN MONGO! Skipping", self.all_data.get("FILEREIN")),Log_Details)
             #print (str.format( "FORM FOR EIN: {0} ALREADY EXISTS IN MONGO!", self.all_data.get("FILEREIN")))
 
 
@@ -252,7 +258,7 @@ class MongoInterface (object):
 
             # Step 3b. Update Main Form Data
             # Remember in our example collection = mongodb_client['irs_xml']['990PF'] 
-            # uncomment if you want to log -> logging.info(str.format("Updating Main Form Data for EIN: {0} Tax Year: {1}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR") ))
+            # uncomment if you want to log -> log_progress('',str.format("Updating Main Form Data for EIN: {0} Tax Year: {1}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR")),Log_Details)
          
             try: 
                 collection.update_one(
@@ -260,7 +266,7 @@ class MongoInterface (object):
                     {'$set': self.all_data}) # Passing all the document data
             
             except Exception as g:
-                logging.info(str.format("Unable to Update Main Form Data for EIN: {0} Tax Year: {1}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR"), g))
+                log_error(g, str.format("Unable to Update Main Form Data for EIN: {0} Tax Year: {1}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR")),Log_Details)
        
         else: 
             # This means we didn't find an existing document so actually the document needs to be inserted not updated. 
@@ -300,7 +306,7 @@ class MongoInterface (object):
             if schedule_filter:
                 # Connect to mongo mongo_database['schedules'] 
                 # Step 2b2a Update document using update_one mongo api https://docs.mongodb.com/manual/reference/method/db.collection.updateOne/
-                #uncomment if you want to log -> logging.info(str.format("Updating Schedule Data for EIN: {0} Tax Year: {1}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR") ))
+                #uncomment if you want to log -> log_progress('',str.format("Updating Schedule Data for EIN: {0} Tax Year: {1}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR")),Log_Details)
                 try:
                     schedules_collection.update_one(
                         {'_id': schedule_id},
@@ -309,6 +315,6 @@ class MongoInterface (object):
                         # Schedule_filter 0 at this point is the underlying schedule data
                     break
                 except Exception as g: 
-                    logging.info(str.format("Unable to Update Schedule Data for EIN: {0} Tax Year: {1} with Schedule Object Id Of: {2}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR"), schedule_id, g))
+                    log_error(g,str.format("Unable to Update Schedule Data for EIN: {0} Tax Year: {1} with Schedule Object Id Of: {2}", self.all_data.get("FILEREIN"),self.all_data.get("TAXYEAR"), schedule_id),Log_Details)
 
        

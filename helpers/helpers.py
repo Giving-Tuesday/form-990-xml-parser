@@ -3,11 +3,14 @@ import os  # python library allows us to use operating system commands like file
 import csv  # allows us to open/close/write to CSV Files
 import re  # python library for regular expressions
 from settings.Settings import mongo_qa_details, mongo_production_details, mapping_main_file, mapping_table_file
+from .loggingutil import Log_Details, log_access, log_error, log_progress # import logging
+
+Log_Details.script = os.path.split(sys.argv[0])[1] # Store name of current script in Log_Details class object as script name. We do this so that error log will always tell us which script error comes from. 
 
 def csv_to_object():
     '''
 
-    This method reads mapping.csv file from disk and converts it to a dictionary
+    This method reads mapping.csv file from disk (i.e. helpers/files/mapping.csv) and converts it to a dictionary
     Output is a dictionary of Paths/Variables
     Sample Output: {'Return/ReturnData/IRS990PF/StatementsRegardingActy4720Grp/SubjToTaxRmnrtnExPrchtPymtInd': 'F9-PF-07-SUBREPARP'}
 
@@ -16,10 +19,16 @@ def csv_to_object():
     csv_object = {}
 
     # Step 2. Open the mapping csv file in read only mode -  Path will be helpers/files/mapping.csv
-    file = open(mapping_main_file, 'r')
+    try:
+        file = open(mapping_main_file, 'r')
+    except Exception as g: 
+        log_error(g,str.format( "Failed To Open Main Mapping File: {0}", mapping_main_file),Log_Details)
 
     # Step 3. Create a list of rows (for each row in csv) row will be a dictionary
-    rows = csv.reader(file.readlines())
+    try:
+        rows = csv.reader(file.readlines())
+    except Exception as g: 
+        log_error(g,str.format( "Failed To Read Main Mapping File: {0}", mapping_main_file),Log_Details)
 
     # Step 4. For each row in list of rows
     for row in rows:
@@ -37,7 +46,7 @@ def csv_to_object():
 def csv_table_to_object():
     '''
 
-    This method reads mapping_table.csv file from disk and converts it to a dictionary
+    This method reads mapping_table.csv file from disk (i.e. helpers/files/mapping_table.csv) and converts it to a dictionary
     Output is a dictionary of Paths/Variables
     Sample Output is {'Return/ReturnData/IRS990ScheduleI/Form990ScheduleIPartII/NoGrantMoreThan5000': 'SI-PC-02-GRANTS_SI_PART_II'}
 
@@ -47,10 +56,16 @@ def csv_table_to_object():
     csv_object = {}
 
     # Step 2. Open Mapping_Table.csv in read only mode -  Path will be helpers/files/mapping.csv
-    file = open(mapping_table_file, 'r')
+    try:
+        file = open(mapping_table_file, 'r')
+    except Exception as g: 
+        log_error(g,str.format( "Failed To Open Mapping Table File: {0}", mapping_table_file),Log_Details)
 
     # Step 3. Create a list of dictionaries represents rows of csv file
-    rows = csv.reader(file.readlines())
+    try:
+        rows = csv.reader(file.readlines())
+    except Exception as g: 
+        log_error(g,str.format( "Failed To Read Mapping Table File: {0}", mapping_table_file),Log_Details)
 
     # Step 4. For each row in the list of rows.
     for row in rows:

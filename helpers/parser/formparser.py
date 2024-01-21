@@ -1,10 +1,13 @@
 #import urllib2 # this is a library that allows us to handle url requests
+import os,sys
 from urllib.request import urlopen
 import re # this allows us to use regular expressions in python
 from lxml import etree # this is an xml parsing library 
 import logging # allows us to store logs
 from helpers.factory.formfactory import FormFactory # library allows us to create forms
+from helpers.loggingutil import Log_Details, log_error # Import Custom Logging
 
+Log_Details.script = os.path.split(sys.argv[0])[1] # Store name of current script in Log_Details class object as script name. We do this so that error log will always tell us which script error comes from. 
 
 URL_IRS = '{http://www.irs.gov/efile}'   # This is a tag present in all XML filings
 REGEXP_SCHEDULE_TYPE = '(.*)-(PF|EZ|PC)' # We use this to undestand what part of form or schedule we are dealing with
@@ -395,7 +398,7 @@ class FormParser (object):
         except Exception as g:
 
             # Step 1b1. Print Exception to console
-            logging.info(str.format( "Issue parsing the following xml file: {0}.", xml_link, g ))
+            log_error(g, str.format( "Issue parsing the following xml file: {0}.", xml_link), Log_Details)
 
         # Step 2/9. Return the form that has been created back to whatever file called this method -> main_xml.py
         # Once the form is created and return, main can then store it or do other things with it.  

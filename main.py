@@ -55,7 +55,7 @@ from pymongo import MongoClient
 # Import all variables that are hardcoded
 from settings.Settings import mongo_qa_details, mongo_production_details
 # Import Custom Logging
-from helpers.logging import Log_Details, log_access, log_error, log_progress
+from helpers.loggingutil import Log_Details, log_access, log_error, log_progress
 
 # Store name of current script in Log_Details class object as script name. We do this so that error log will always tell us which script error comes from. 
 Log_Details.script = os.path.split(sys.argv[0])[1]
@@ -239,8 +239,8 @@ def init(index_name):
                         len(filings) + continue_progress
                     )
 
-                    # 3b7d. Log Progress we keep this uncommented as we will already have details at document level (elsewhere in code)
-                    log_progress('', 'Parser Progress: %s Finished inserting: %s' % (progress, xml_link), Log_Details) # original logging -> #logging.info(progress) 
+                    # 3b7d. Log Progress we keep this commented as we will already have details at document level (elsewhere in code)
+                    #log_progress('', 'Parser Progress: %s Finished inserting: %s' % (progress, xml_link), Log_Details) # original logging -> #logging.info(progress) 
 
                     # 3b7e. Log our progress to the console
                     print (progress)
@@ -253,6 +253,7 @@ if __name__ == '__main__':
     # Step 1a - Check to see if -t in arguments that triggers a testing of database connections
     if '-t' in ARGS:  
         print ('Testing Connections')
+        log_access('', 'Started Running The XML Parser with following arguments & flags: %s' % initial_args, Log_Details)
 
         # Step 1b. Test Connection to QA/Local Mongo database
         try: 

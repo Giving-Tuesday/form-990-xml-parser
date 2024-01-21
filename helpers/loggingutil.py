@@ -71,7 +71,7 @@ logger_progress  = logging.getLogger("progress")
 logger_progress.setLevel(logging.INFO)
 
 ## Setup Progress  Log Handler -> In this case a file handler to dump error log to /logs/progress.log
-progress_file_handler =  logging.FileHandler(progress_log_location, mode='w')
+progress_file_handler =  logging.FileHandler(progress_log_location, mode='a')
 
 ## Setup Progress  Log Formatter -> To ensure error logs have appropriate time stamps
 progress_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

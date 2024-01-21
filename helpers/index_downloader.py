@@ -1,13 +1,13 @@
-import os # allows us to use operating system functions
+import os,sys # allows us to use operating system functions
 import json # allows us to parse and store json
-import logging # allows us to log events
 #import urllib2 # allows us to handle urls - requests etc
 from urllib.request import urlopen
 from datetime import datetime, timedelta # allows us to figure out what date we are on and calculate a difference in dates
 import requests
 from settings.Settings import indices_directory_name, gt_datalake_index_location
+from .loggingutil import Log_Details, log_access, log_error, log_progress
 
-
+Log_Details.script = os.path.split(sys.argv[0])[1] # Store name of current script in Log_Details class object as script name. We do this so that error log will always tell us which script error comes from. 
 ROOT_DIR = os.path.join(os.path.dirname(__file__)) # Sets root to Helpers Directory
 INDEXES_DIR = os.path.join(ROOT_DIR, indices_directory_name) # adds "indices" to the helpers directory path
 
@@ -42,8 +42,7 @@ def download_index(index_name):
 
         # Step 4a. If file path doesnt exist print to console that you are downloading the index from amazon. 
         print (str.format('Downloading & saving index {0} from amazon.', index_name))
-        logging.info(str.format('Downloading & saving index {0} from amazon.', index_name))
-
+        log_progress('',str.format('Downloading & saving index {0} from amazon.', index_name),Log_Details)
         try:
 
             #Step 4b. Store the downloaded index as "response"  
@@ -61,10 +60,11 @@ def download_index(index_name):
 
         except Exception as g:
             print(str.format( "Failed To Download Index: {0} Giving Tuesday AWS: {1} Error was: {2}", index_name, full_url, g ))
-            logging.info(str.format( "Failed To Download Index: {0} Giving Tuesday AWS: {1} Error was: {2}", index_name, full_url, g ))
+            log_error(g,str.format( "Failed To Download Index: {0} Giving Tuesday AWS: {1}", index_name, full_url),Log_Details)
 
     else:
         print (str.format('Index: {0} Already Exists Locally No Need to Download', index_name))
+        log_progress('',str.format('Index: {0} Already Exists Locally No Need to Download', index_name),Log_Details)
 
 
 def remove_index(index_name):
@@ -85,9 +85,9 @@ def remove_index(index_name):
         # Step 3. Remove the path -> i.e. remove the file. 
         try:
             os.remove(path)
-            logging.info(str.format( "Successfully Removed Index: {0}", index_name ))
+            log_progress('',str.format( "Successfully Removed Index: {0}", index_name),Log_Details)
         except Exception as g:
-            logging.info(str.format( "Failed To Remove Index: {0} from Mongo: Error was: {1}", index_name, g ))
+            log_error(g, str.format( "Failed To Remove Index: {0} from Mongo", index_name),Log_Details)
  
 
 def fetch_filings_from_index_file(index_name):
@@ -100,7 +100,7 @@ def fetch_filings_from_index_file(index_name):
     '''
 
     # Step 1: Download Index Call the download_index method and pass index_name
-    #download_index(index_name)
+    download_index(index_name)
 
     # Step 2. Create a file path for index_name we are processing. 
     file_path = str.format('{0}.json', index_name)
@@ -130,7 +130,7 @@ def fetch_filings_from_index_file(index_name):
             return index_list 
 
     except Exception as g:
-        logging.info(str.format( "Failed To Fetch Filings From Index named: {0} error was: {1}", index_name, g ))
+        log_error(g,str.format( "Failed To Fetch Filings From Index named: {0}", index_name),Log_Details)
         return None
 
 def fetch_filings_updated(index_name):
