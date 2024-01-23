@@ -3,9 +3,9 @@ import logging # Import Pythons Logging Library
 
 ########### Logging Details
 # We have 3 Logs
-# Access Log = Basically keeps track of time parser was activated and finished.
-# Error Log = Keeps track of any issues arising during the running of the parser. 
-# Progress Log = Keeps track of the script as it runs. But only exists for each independent session. I.e. its overwritten 
+    # Access Log = Basically keeps track of time parser was activated and finished.
+    # Error Log = Keeps track of any issues arising during the running of the parser. 
+    # Progress Log = Keeps track of the script as it runs. But only exists for each independent session. I.e. its overwritten 
 
 # Log Locations - i.e. where things get saved to
 access_log_location = './logs/access.log' 

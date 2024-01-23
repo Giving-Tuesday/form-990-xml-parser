@@ -11,6 +11,8 @@ Log_Details.script = os.path.split(sys.argv[0])[1] # Store name of current scrip
 ROOT_DIR = os.path.join(os.path.dirname(__file__)) # Sets root to Helpers Directory
 INDEXES_DIR = os.path.join(ROOT_DIR, indices_directory_name) # adds "indices" to the helpers directory path
 
+# Overview: Variety of methods for downloading and processing index data from Giving Tuesday Datalake on AWS
+
 
 def download_index(index_name):
 

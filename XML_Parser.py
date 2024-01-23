@@ -2,9 +2,10 @@
     XML Parser Script 
     
     Goal: 
-    (1) Download Index hosted on the Giving Tuesday DataLake 
-    (2) Parse each XML file and process the xml data according to a mapping of variables and paths
-    (3) Store resulting data into Mongo DB (a non relational document store)
+    (1) Download Index hosted on the Giving Tuesday DataLake or Process the Index locally (i.e. its pre-downloaded)
+    (2) Download each xml that is referenced in the index
+    (3) Parse each XML file and process the xml data according to a mapping of variables and paths
+    (4) Store resulting data into Mongo DB (a non relational document store)
 
     Parser commands that can be passed from command line/terminal: 
     -i {Index Name} Insert command -  with index_name as latest_only_year_month_day or all_years_year_month_day 

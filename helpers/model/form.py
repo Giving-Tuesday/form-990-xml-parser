@@ -1,8 +1,6 @@
 
 from helpers.database.interface import MongoInterface 
-# we are importing two interfaces one for each places we will store data to ie. mongo  
-# each interface contains methods to access databases 
-
+# Overview: 3 Classes (1 per document)  with one interface per form, each interface contains methods to access databases 
 
 class Form990PF (MongoInterface):
 

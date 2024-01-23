@@ -1,6 +1,7 @@
 
-from helpers.model.form import Form990, Form990PF, Form990EZ  # this is form.py has 3 classes one for each form with 1 interface for  mongo
+from helpers.model.form import Form990, Form990PF, Form990EZ  
 
+# Overview: 3 classes one for each form with 1 interface for mongo
 
 class FormFactory (object):
 

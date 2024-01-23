@@ -18,7 +18,7 @@ SIZE_MAX_MONGO = mongo_max_document_size # Max size is 16mb for regular document
 ## Connect To Mongo
 try:
     # Step 1 Try Connecting To Mongo notice TLS is disabeled as are certs
-    #print ("Connecting to Mongo")
+    print ("Connecting to Mongo")
     mongodb_client = MongoClient(get_config('mongo'),connect=False)
 
 except Exception as g:

@@ -1,110 +1,198 @@
 # Introduction
 
-This is package was designed to process XML versions of FORM 990 Filings hosted on Amazon Web Services.
+### Part 1. Background - What are Form 990s & Form 990xmls
 
-**Big picture** This scripts works by:
+Every year all charities in the United States must file their annual tax returns (i.e Form 990) electronically with the IRS. This process is known as "efiling" a tax return which is similar to individuals using TurboTax (and other tools) to file their tax returns. 
 
-- Downloading all XML Filings hosted by Amazon Web Services for a given year (i.e. within an yearly index)
-- Parse the XML document and process xml data according to a mapping of variables and paths
-- Store resulting data into Mongo DB & Elastic Search
+Form 990s are considered public documents (i.e. open for public inspection) and the IRS releases these efiled forms as XML files on the IRS website https://www.irs.gov/charities-non-profits/form-990-series-downloads
 
-## Visual overview of main steps:
+In 2023 Giving Tuesday partnered with CitizenAudit to build:
+- A free public facing Datalake to host all past and current IRS Charity Data. 
+- A set of ongling indices cataloging all available data (hosted in the Datalake)
 
-**Step 1: Downloading & Storing Index from AWS**
+The public data lake (files and indices) is available via AWS at arn:aws:s3:::gt990datalake-rawdata and the relevant documentation is here: [XXXXXXX]
+
+### Part 2:  A Parser to Process Form 990 XMLs and store data into mongodb
+ 
+This Package was designed to:
+
+- Download (or process locally available) Json indices of the IRS Form 990 Xml Files created by Giving Tuesday and hosted on the Giving Tuessday 990 Charity Datalake
+- Download Form 990 Xml Files referenced in each index (in prior step from the datalake)
+- Parse IRS Form 990 Xml Files according to the mapping of 990 variables and paths found in the 990 Concordance Files into json documents. You can learn more about the concordance files here [XXXXXX]
+- Store json documents into a non relational database (i.e. Mongodb).
+
+**Core Package Components**:
+- Helpers/Concordance_Files - Contain Mapping of Xml Variables/paths
+- Parser - Controlled by XML_Parser.py which executes the parser
+- Logger - Tracks any access,errors, and status/progress of parser.
+
+Visual overview of parser steps (outlined above):
+
+Step 1: Downloading & Storing Index from Giving Tuesday Data Lake
 
 ![Alt text](images/Picture1.png "Donwload Index")
 
-**Step 2: Downloading, Parsing, & Converting XML documents to JSON documents**
+Step 2: Downloading, Parsing, & Converting XML documents to JSON documents
 
 ![Alt text](images/Picture2.png "Convert xml to json")
 
-**Step 3: Inserting JSON documents into Mongo**
+Step 3: Inserting JSON documents into Mongo
 ![Alt text](images/Picture3.png "Insert Data")
 
-## Main files & folders
+### Part 3. Technical Details
 
-| File/Folder                   | Description                                                                                                         |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| xml_parser.py                 | This file is the main script (run from commandline) it initiates downloads, updates, and insertions of files/forms. |
-| helpers/index_downloader.py   | This file downloads indexes from AWS.                                                                               |
-| helpers/parser/form_parser.py | This file contains all methods necessary to parse xml forms.                                                        |
-| helpers/database/interface.py | This file contains all methods necessary to connect to mongo as well as to perform CRUD operations |  | helpers/files | This folder contains 2 files which have mappings for the variables i.e. paths and variables we will be storing |
-| helpers/helpers.py            | This file contains general purpose methods used by all other scripts.                                               |
+#### Technical Stack
+    - Python 3.9 or later
+    - Pip 21.0 or later
+    - Virtualenv & Virtualenvwrapper (optional)
 
-## How to use Script from Command Line
+#### Python Libraries (per requirements.txt)
+    aiohttp==3.8.1
+    aiosignal==1.2.0
+    async-timeout==4.0.2
+    asynctest==0.13.0
+    attrs==21.4.0
+    certifi==2021.10.8
+    charset-normalizer==2.0.10
+    dnspython==2.2.1
+    frozenlist==1.2.0
+    idna==3.3
+    idna-ssl==1.1.0
+    lxml==5.1.0
+    multidict==5.2.0
+    pymongo==4.1.1
+    requests==2.27.1
+    typing_extensions==4.0.1
+    urllib3==1.26.8
+    yarl==1.7.2
+
+#### Code Repository Directory Structure
+```
+Parser
+├── Helpers   
+│   ├── Database                           
+│   │   ├── interface.py                    # Contains an interface class allowing us to load documents into mongo as well as perform other CRUD operations.
+│   ├── Factory 
+│   │   ├── formfactory.py                  # Imports 3 classes one for each form from form.py (below) with 1 interface for mongo
+│   ├── Concordance_Files                   # Contains mappings
+│   │   ├── mapping.csv                     # Concordance mapping file for all non table paths/variables of form 990s
+│   │   ├── mapping_table.csv               # Concordance mapping file for all table paths/variables of form 990s
+│   ├── Indices
+│   │   ├── latest_only_0000-12-21.json     # Small sample index file for testing/debugging purposes
+│   │   ├── latest_only_0000-12-21.json     # Small sample index file for testing/debugging purposes
+│   ├── Model
+│   │   ├── form.py                         # Constructs 3 Classes (1 per form type 990/990ez/990pf)  with one interface per form (via interface.py), each interface contains methods to access databases 
+│   ├── Parser
+│   │   ├── formparser.py                   # Each form parser is a class object with 4 initiated variables/objects and various methods used to parse xml
+│   ├── helpers.py                          # Variety of helper methods used across library
+│   ├── index_downloader.py                 # Helper methods used to download xml indices from Giving Tuesday Datalake 
+│   ├── loggingutil.py                      # Logging library to help us log access, errors, and parser status/progress.
+├── Images                                  # Series of graphic flowcharts inserted in the README.md file below
+│   ├── Picture1.png  
+│   │   ....
+│   ├── Picture5.png  
+├── Logs                                    # Storage of all logs generated during use of the script
+├── Settings    
+│   ├── Settings.py                         # All settings used across project.  
+└── .gitignore                              # Lists files that will & will not be committed by git
+└── README.md                               # Repo readme file (i..e what you are reading now)
+└── Requirements.txt                        # Libraries required for Parser to work.
+└── XML_Parser.py                           # This file is the main script (run from the commandline) it initiates downloads, updates, and insertions of files/forms.
+```
+
+### Part 4. Getting Started
+
+#### Prerequirements
+
+#### Setting up the parser
+
+#### Using the Parser from The Command Line
 
 Parser commands that can be passed from command line/terminal:
 
 | Command        | Description                                                            | Default     |
 | -------------- | ---------------------------------------------------------------------- | ----------- |
-| -i {Year}      | Inserting command with year                                            | ----------- |
+| -i {IndexName}      |Note: Json names from Giving Tuesday Datalake must follow one of the following | ----------- |
+| |all_years_{year}-{month}-{date} json file extension is not needed|-----------|
+| |latest_only_{year}-{month}-{date} json file extension is not needed|-----------|
 | -f             | When processing removes and insert forms versus just inserting         | ----------- |
 | -l {Number}    | Number of forms that will be inserted simultaneously                   | 1000        |
 | -c {Number}    | Location from an index where you want to continue inserting/processing | ----------- |
-| -u             | Update forms                                                           | ----------- |
-| -cm            | Check if there are new xpaths for adding it into the mapping           | ----------- |
+| -u             | Update Index and insert new documents                                                          | ----------- |
 | --mongodb      | Mongo                                                                  | ----------- |
-| --qa           | Specifies the environment QA                                           | ----------- |
-| --prod         | Specifies the environment PRODUCTION                                   | ----------- |
-| --backup       | Specifies the environment BACKUP (production backup)                   | ----------- |
+| --qa           | Specifies the QA/Local Environment Mongo                               | ----------- |
+| --prod         | Specifies the Production Environment                                  | ----------- |
 
-### Example Use Cases
+**Commandline Examples:** 
 
-- Insert 2018 data into mongo in production. Use python 2 and nohup means dont terminate process when we logout of ssh session.
-
-```sh
-$ nohup python3 ./xml_parser.py -i 2018 --prod --mongodb
-```
-
-- Insert 2011 data into mongo in qa
+- Insert xmls from the latest_only_0000-12-21.json index into production mongodb. 
 
 ```sh
-$ python3 xml_parser.py -i 2011 --mongodb --qa
+$ python3 XML_Parser.py -i latest_only_0000-12-21 --prod --mongodb
 ```
 
-- Insert 2011 data into mongodb in qa. Insert only 100 documents at a time.
+- Insert xmls from the latest_only_0001-12-21.json index into qa mongodb.
 
 ```sh
-$ python3 xml_parser.py -i 2011 -l 100 --mongodb --qa
+$ python3 XML_Parser.py -i latest_only_0001-12-21 --qa --mongodb 
 ```
 
-- Insert 2011 into mongo db using force insert - by deleting and reinserting the data.
+- Insert xmls from the latest_only_0001-12-21.json index into qa mongodb. Insert only 100 documents at a time.
 
 ```sh
-$ python3 xml_parser.py -i 2011 -f --mongodb
+$ python3 XML_Parser.py -i latest_only_0001-12-21 -l 100 --qa --mongodb
 ```
 
-- Insert 2011 data into mongo db continue from position 20 in the 2011 index.
+- Insert xmls from the latest_only_0001-12-21.json index using force insert - by deleting and reinserting the data (file by file) into production mongodb.
 
 ```sh
-$ python3 xml_parser.py -i 2011 -c 20 --mongodb
+$ python3 XML_Parser.py -i latest_only_0001-12-21 -f --prod --mongodb
 ```
 
-- Update forms.
+- Insert xmls from the latest_only_0001-12-21.json continuing from position 20 in the latest_only_0001-12-21.json index into production mongodb.
 
 ```sh
-$ python3 xml_parser.py -u
+$ python3 XML_Parser.py -i latest_only_0001-12-21 -c 20 --prod --mongodb
 ```
 
-- Insert multiple years 2011 & 2018 into monogo.
+- Insert multiple indices latest_only_0000-12-21 and latest_only_0001-12-21 into production monogodb.
 
 ```sh
-$ python3 xml_parser.py -i 2011-2018 --mongo
+$ python3 XML_Parser.py -i latest_only_0000-12-21.json latest_only_0001-12-21.json --prod --mongodb
 ```
 
-## Communicating with Data Stores - i.e. Mongo
+- Process updated index latest_only_0001-12-21.json into production mongodb. For example presume index latest_only_0001-12-21.json has been updated, or modified. We need to then process and insert any new files into mongodb. 
 
-- helpers/ helpers.py - Line 70 contains settings for Mongo
-- helpers/database/interface.py - Contains methods for dealing with Mongo
+```sh
+$ python3 XML_Parser.py -u latest_only_0001-12-21 --prod --mongodb
+```
 
-## Error Logging
+### Part 5. FAQ & Troubleshooting
+- Most Common Errors:
+    - Incorrect parameters passed via commandline. 
+        - Remember index names do not require .json file typing_extensions but if you are downloading from the GivingTuesday datalake you will need to use one of the following index naming conventions
+            - all_years_{year}-{month}-{date}.json
+            - latest_only_{year}-{month}-{date}.json
+        - Remember to pass flags regarding location of indices local vs datalake or it will assume datalake and thus naming can fail.
+    - Misconfigured Settings/settings.py
+    - Missing concordance mapping files in helpers/concordance_files
+- User wants to leave parser running. 
+    - Option 1. 
+        - For Windows user use:  python3w filename.py the 'w' after Python tells interpreter to run code in background
+            ```sh
+            $ python3w XML_Parser.py -i latest_only_0001-12-21 --qa --mongodb
+            ```
+        - For Linux or mac users use: python3 filename.py &  Note: the "&"" sign will tell interpreter to run in background
+            ```sh
+            $ python3 XML_Parser.py & -i latest_only_0001-12-21 --prod --mongodb
+            ```
+    - Option 2.  
+        - Use nohup which means dont terminate process when we logout of ssh or terminal session (there will be a nohup.out file created)
+            ```sh
+            $ nohup python3 XML_Parser.py -i latest_only_0001-12-21 --prod --mongodb
+            ```
+    - Option 3. Use Linux Screens google for tutorials.
 
-- General errors are also stored at nohup.out
-- Remember error logs are simply stored as .log files at the base level of IRS_XML_Parser
-- Creation of Logs handled following location: Line 130 & 183 of xml_parser.py
-- Mongo logging is handled following locations Lines: 89, 115, 122 of helpers/database/interface.py
 
-# References
+### Part 6. References
 
-- https://aws.amazon.com/public-datasets/irs-990/ (Irs 990 Filings)
-- https://s3.amazonaws.com/irs-form-990/index_2011.json (Example of index.json)
