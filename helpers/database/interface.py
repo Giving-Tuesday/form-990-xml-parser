@@ -20,6 +20,7 @@ try:
     # Step 1 Try Connecting To Mongo notice TLS is disabeled as are certs
     # print ("Connecting to Mongo")
     mongodb_client = MongoClient(get_config('mongo'),connect=False)
+    log_progress('',str.format("Connected To Mongo", Log_Details))
 
 except Exception as g:
     #print ('Initial Connection Failed Trying Different Connection Approach')
@@ -36,7 +37,7 @@ except Exception as g:
 mongo_database = mongodb_client[mongo_database_name] 
 
 ## Select Appropriate Schedules Collection Details
-schedules_collection = mongo_database[schedules_reg_collection_name]           # mongo collection that holds schedules
+schedules_collection = mongo_database[schedules_reg_collection_name]             # mongo collection that holds schedules
 schedules_collection_b = GridFS(mongo_database, schedules_large_collection_name) # mongo collection that holds schedules larger than 16mb
 
 
