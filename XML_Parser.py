@@ -12,7 +12,9 @@
     -f              Force  command - used when inserting which removes and insert forms versus just inserting    
     -l {Number}     Limit  command - Number of forms that will be inserted simultaneously default 1000
     -c {Number}     Continue command - Location from an index where you want to continue/begin inserting/processing 
-    -u              Update command - Re downloads a specific index incase things have changed    
+    -u              Update command - Re downloads a specific index incase things have changed   
+    --local         Index is available locally in helpers/indices/
+    --gtdatalake    Index is to be downloaded from the givingtuesday datalake. Index name above in -i must follow giving tuesday naming conventions
     --mongodb       Mongo 
     --qa            Specifies the environment QA            - Local Test Environment
     --prod          Specifies the environment PRODUCTION    - AWS Production Environment 
@@ -71,6 +73,7 @@ ARGS = sys.argv[1:]
 initial_args = ' '. join([str(arg) for arg in sys.argv[1:]])
 
 def init(index_name):
+
     '''
     This is our main function which takes a index_name from console along with other consle arguments
     It then processes filings for that index_name and inserts them into mongodb. 
@@ -303,7 +306,7 @@ if __name__ == '__main__':
                 # Step 2a2a2.
                 # we are essentially passing the function init into Pool so
                 # it can run in separate cores and then we are saying
-                # if indexes are = [latest_only_2018-12-31.json,a ll_years_2017-12-31.json] pass 2017, and 2018 into init one for each pool i.e. run in parallel
+                # if indexes are = [latest_only_2018-12-31.json,all_years_2017-12-31.json] pass 2017, and 2018 into init one for each pool i.e. run in parallel
                 POOL.map(init, indices) 
 
             # Step 2a2b. If only 1 index name has been passed then we wont run it in parallel because the document insertion already happens as parallel batches.

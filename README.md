@@ -134,6 +134,8 @@ Parser commands that can be passed from command line/terminal:
 | -i {IndexName}      |Note: Json names from Giving Tuesday Datalake must follow one of the following | ----------- |
 | |all_years_{year}-{month}-{date} json file extension is not needed|-----------|
 | |latest_only_{year}-{month}-{date} json file extension is not needed|-----------|
+| --local| Index from -i command is available locally in helpers/indices/ |-----------|
+| --gtdatalake| Index from -i command is to be downloaded from giving tuesday datalake | gtdatalake|
 | -f             | When processing removes and insert forms versus just inserting         | ----------- |
 | -l {Number}    | Number of forms that will be inserted simultaneously                   | 1000        |
 | -c {Number}    | Location from an index where you want to continue inserting/processing | ----------- |
@@ -144,16 +146,16 @@ Parser commands that can be passed from command line/terminal:
 
 **Commandline Examples:** 
 
-- Insert xmls from the latest_only_0000-12-21.json index into production mongodb. 
+- Insert xmls from the latest_only_0000-12-21.json index found locally into production mongodb. 
 
 ```sh
-$ python3 XML_Parser.py -i latest_only_0000-12-21 --prod --mongodb
+$ python3 XML_Parser.py -i latest_only_0000-12-21 --local --prod --mongodb
 ```
 
-- Insert xmls from the latest_only_0001-12-21.json index into qa mongodb.
+- Insert xmls from the latest_only_0001-12-21.json index via giving tuesday datalake into qa mongodb.
 
 ```sh
-$ python3 XML_Parser.py -i latest_only_0001-12-21 --qa --mongodb 
+$ python3 XML_Parser.py -i latest_only_0001-12-21 --gtdatalake --qa --mongodb 
 ```
 
 - Insert xmls from the latest_only_0001-12-21.json index into qa mongodb. Insert only 100 documents at a time.

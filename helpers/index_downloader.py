@@ -21,6 +21,7 @@ def download_index(index_name):
     This method will download a json index containing links to filings hosted on the giving tuesday aws data lake. 
     This method takes a index_name i.e. latest_only_2018-12-31.json and download it from
     https://gt990datalake-rawdata.s3.amazonaws.com/Indices/990xmls/index_latest_only_efiledata_xmls_created_on_2018-12-31.json
+    All indices are available -> https://gt990datalake-rawdata.s3.amazonaws.com/Indices/990xmls/
    
     '''
 
@@ -96,13 +97,22 @@ def fetch_filings_from_index_file(index_name):
 
     '''
 
-    This method downloads an index and then creates a list of filings from the index file. 
+    This method downloads an index in json format and then creates a list of filings from the index file. 
     This method takes index_name -> i.e. 2018
 
     '''
 
-    # Step 1: Download Index Call the download_index method and pass index_name
-    download_index(index_name)
+    # Step 1a. Grab Index Location Flag From Commandline
+
+    ENV = 'gt'
+    if '--gtdatalake' in sys.argv[1:]:
+        ENV = 'gt'
+    elif '--local' in sys.argv[1:]:
+        ENV = 'local'
+    
+    if ENV !='local': # If we have --gtdatalake passed via commandline then download index from giving tuesday datalake
+        # Step 1b: Download Index by calling the download_index method and pass index_name name with appropriate naming conventions "all_years + date or latest_only + date" 
+        download_index(index_name)
 
     # Step 2. Create a file path for index_name we are processing. 
     file_path = str.format('{0}.json', index_name)
