@@ -100,13 +100,13 @@ class MongoInterface (object):
                 'FILEREIN': self.all_data['FILEREIN'],
                 'TAXYEAR': self.all_data['TAXYEAR']
             })
+            return nonprofit is None # Step 2b if the search results in nothing then we return None
 
         except Exception as g:
             # Step 2b if the search results in nothing then we return None
             log_error(g, "Failed to check if form does not exist", Log_Details)
 
-        # Step 2b if the search results in nothing then we return None
-        return nonprofit is None
+            return False # we return false and store ein for logging
 
     def insert_data_to_mongo(self):
 
