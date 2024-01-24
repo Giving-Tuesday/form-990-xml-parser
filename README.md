@@ -131,7 +131,7 @@ Parser commands that can be passed from command line/terminal:
 
 | Command        | Description                                                            | Default     |
 | -------------- | ---------------------------------------------------------------------- | ----------- |
-| -i {IndexName}      |Note: Json names from Giving Tuesday Datalake must follow one of the following | ----------- |
+| -i {IndexName}      |Note: Json file names from Giving Tuesday Datalake must follow one of the following | ----------- |
 | |all_years_{year}-{month}-{date} json file extension is not needed|-----------|
 | |latest_only_{year}-{month}-{date} json file extension is not needed|-----------|
 | --local| Index from -i command is available locally in helpers/indices/ |-----------|
@@ -145,6 +145,9 @@ Parser commands that can be passed from command line/terminal:
 | --prod         | Specifies the Production Environment                                  | ----------- |
 
 **Commandline Examples:** 
+
+Note: We have included several sample indices in the helpers/indices folder for you to practice with. 
+
 
 - Insert xmls from the latest_only_0000-12-21.json index found locally into production mongodb. 
 
@@ -194,8 +197,50 @@ $ python3 XML_Parser.py -u latest_only_0001-12-21 --prod --mongodb
         - Remember index names do not require .json file typing_extensions but if you are downloading from the GivingTuesday datalake you will need to use one of the following index naming conventions
             - all_years_{year}-{month}-{date}.json
             - latest_only_{year}-{month}-{date}.json
-        - Remember to pass flags regarding location of indices local vs datalake or it will assume datalake and thus naming can fail.
+        - Remember to pass flags regarding location of indices local vs gtdatalake or it will assume gtdatalake and thus naming can fail.
+    - Inadequate indices - this happens if you are using your own indices particularly with no URL key. A sample entry from our json index is as follows: 
+        ``` sh
+            {
+            "BuildTs": "2023-04-26 12:10:37Z",
+            "DAF": "False",
+            "DateSigned": "2023-10-18",
+            "DocStatus": "AmendedReturn, InitialReturn",
+            "EIN": "873700196",
+            "FileSha256": "fd455623a094c199a67809195460b97a1756dbebf514e2d8614c911cc76febbb",
+            "FileSizeBytes": "37725",
+            "FormType": "990PF",
+            "GrossReceipts": null,
+            "GroupAffiliatesIncluded": null,
+            "GroupExemptionNumber": null,
+            "GroupReturnForAffiliates": null,
+            "IndexedOn": "2023-12-21",
+            "LegalDomicileCountry": null,
+            "LegalDomicileState": null,
+            "ObjectId": "202312919349100301",
+            "OrgType": "ExemptPF",
+            "OrganizationName": "GU AND YANG FAMILY FOUNDATION",
+            "ReturnTs": "2023-10-18T03:03:48-04:00",
+            "ReturnVersion": "2022v5.0",
+            "SubmittedOn": "2023-10-18",
+            "TaxPeriod": "2022-12-31",
+            "TaxPeriodBeginDate": "2022-01-01",
+            "TaxPeriodEndDate": "2022-12-31",
+            "TaxStatus": null,
+            "TaxYear": "2022",
+            "TotalAssetsBkEOY": "148541",
+            "TotalExpensesCY": "13272",
+            "TotalLiabilitiesBkEOY": "0",
+            "TotalNetAssetsBkEOY": "148541",
+            "TotalRevenueCY": "134265",
+            "URL": "https://gt990datalake-rawdata.s3.amazonaws.com/EfileData/XmlFiles/202312919349100301_public.xml",
+            "Website": null,
+            "YearFormed": null,
+            "ZipFile": null
+        } 
+        ```
+
     - Misconfigured Settings/settings.py
+      - Improperly configured mongodb settings, concordance/mapping names and mongodb collection names.
     - Missing concordance mapping files in helpers/concordance_files
       - Mapping Concordance files are csvs that look like this: 
           - Header Row    ----- VARIABLE_NAME,DESCRIPTION,LOCATION,XPATH
