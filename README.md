@@ -272,3 +272,5 @@ $ python3 XML_Parser.py -u latest_only_0001-12-21 --prod --mongodb
 - 3. Concordance/Mapping file details:
   - https://nonprofit-open-data-collective.github.io/irs-efile-master-concordance-file/
   - https://github.com/Nonprofit-Open-Data-Collective/irs-efile-master-concordance-file
+
+### Licensing TBD
