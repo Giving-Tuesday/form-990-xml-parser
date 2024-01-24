@@ -295,6 +295,7 @@ if __name__ == '__main__':
                 "(?:'-i', ').(latest_only_[0-9]{4}-[0-9]{2}-[0-9]{2})'|(all_years_[0-9]{4}-[0-9]{2}-[0-9]{2})|(latest_only_[0-9]{4}-[0-9]{2}-[0-9]{2})", 
                 str(sys.argv)).group(0)]
 
+
             # Step 2a2a.  If more than 1 index name has been requested to be inserted
             if len(indices) >= 2:  
 

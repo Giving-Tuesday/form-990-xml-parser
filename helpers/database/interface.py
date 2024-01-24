@@ -20,7 +20,7 @@ try:
     # Step 1 Try Connecting To Mongo notice TLS is disabeled as are certs
     # print ("Connecting to Mongo")
     mongodb_client = MongoClient(get_config('mongo'),connect=False)
-    log_progress('',str.format("Connected To Mongo", Log_Details))
+    log_progress('',str.format("Connected To Mongo"), Log_Details)
 
 except Exception as g:
     #print ('Initial Connection Failed Trying Different Connection Approach')
