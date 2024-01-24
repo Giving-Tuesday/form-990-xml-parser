@@ -1,0 +1,4 @@
+2024-01-23 23:47:56,883 - progress - INFO - Script: XML_Parser.py - Message: PROCESSING EIN: 873700196 & Inserting into Mongo
+2024-01-23 23:48:27,146 - progress - INFO - Script: XML_Parser.py - Message: FORM FOR EIN: 873700196 ALREADY EXISTS IN MONGO! Skipping
+2024-01-23 23:48:27,690 - progress - INFO - Script: XML_Parser.py - Message: PROCESSING EIN: 540601700 & Inserting into Mongo
+2024-01-23 23:48:47,225 - progress - INFO - Script: XML_Parser.py - Message: PROCESSING EIN: 873700196 & Inserting into Mongo

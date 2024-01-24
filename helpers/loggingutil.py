@@ -8,9 +8,9 @@ import logging # Import Pythons Logging Library
     # Progress Log = Keeps track of the script as it runs. But only exists for each independent session. I.e. its overwritten 
 
 # Log Locations - i.e. where things get saved to
-access_log_location = './logs/access.log' 
-error_log_location = './logs/error.log' 
-progress_log_location = './logs/progress.log' 
+access_log_location = './helpers/logs/access.log' 
+error_log_location = './helpers/logs/error.log' 
+progress_log_location = './helpers/logs/progress.log' 
 
 ## Create Simple Logging Classes that will create & store script as a variable. 
 

@@ -1,8 +1,6 @@
 #helpers/indices/*.json
 helpers/.DS_Store
 *.DS_Store
-log-*
-*.log
 *.out
 *.pyc
 *.pickle
