@@ -71,9 +71,9 @@ Step 3: Inserting JSON documents into Mongo
 Parser
 ├── Helpers   
 │   ├── Database               
-│   │   ├── interface.py            # Contains an interface class allowing us to load documents into mongo as well as perform other CRUD operations.
+│   │   ├── interface.py                    # Contains an interface class allowing us to load documents into mongo as well as perform other CRUD operations.
 │   ├── Factory 
-│   │   ├── formfactory.py          # Imports 3 classes one for each form from form.py (below) with 1 interface for mongo
+│   │   ├── formfactory.py                  # Imports 3 classes one for each form from form.py (below) with 1 interface for mongo
 │   ├── Concordance_Files                   # Contains mappings
 │   │   ├── mapping.csv                     # Concordance mapping file for all non table paths/variables of form 990s
 │   │   ├── mapping_table.csv               # Concordance mapping file for all table paths/variables of form 990s
@@ -83,21 +83,21 @@ Parser
 │   ├── Model
 │   │   ├── form.py                         # Constructs 3 Classes (1 per form type 990/990ez/990pf)  with one interface per form (via interface.py), each interface contains methods to access databases 
 │   ├── Parser
-│   │   ├── formparser.py           # Each form parser is a class object with 4 initiated variables/objects and various methods used to parse xml
-│   ├── helpers.py              # Variety of helper methods used across library
+│   │   ├── formparser.py                   # Each form parser is a class object with 4 initiated variables/objects and various methods used to parse xml
+│   ├── helpers.py                          # Variety of helper methods used across library
 │   ├── index_downloader.py                 # Helper methods used to download xml indices from Giving Tuesday Datalake 
-│   ├── loggingutil.py            # Logging library to help us log access, errors, and parser status/progress.
-├── Images                  # Series of graphic flowcharts inserted in the README.md file below
+│   ├── loggingutil.py                      # Logging library to help us log access, errors, and parser status/progress.
+├── Images                                  # Series of graphic flowcharts inserted in the README.md file below
 │   ├── Picture1.png  
 │   │ ....
 │   ├── Picture5.png  
-├── Logs                  # Storage of all logs generated during use of the script
+├── Logs                                    # Storage of all logs generated during use of the script
 ├── Settings    
-│   ├── Settings.py                     # All settings used across project.  
-└── .gitignore                          # Lists files that will & will not be committed by git
-└── README.md                           # Repo readme file (i..e what you are reading now)
-└── Requirements.txt                  # Libraries required for Parser to work.
-└── XML_Parser.py                         # This file is the main script (run from the commandline) it initiates downloads, updates, and insertions of files/forms.
+│   ├── Settings.py                         # All settings used across project.  
+└── .gitignore                              # Lists files that will & will not be committed by git
+└── README.md                               # Repo readme file (i..e what you are reading now)
+└── Requirements.txt                        # Libraries required for Parser to work.
+└── XML_Parser.py                           # This file is the main script (run from the commandline) it initiates downloads, updates, and insertions of files/forms.
 ```
 
 ### Part 4. Getting Started
