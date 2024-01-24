@@ -370,7 +370,14 @@ class FormParser (object):
         # Step 1a. Try to run following code
         try:
             # Step 2 Given a link download the filing and store as parser.root
-            self.root = etree.XML(urlopen(xml_link).read())
+
+            try:
+                self.root = etree.XML(urlopen(xml_link).read())
+
+            except Exception as g:
+
+                # Step 1b1. Print Exception to console
+                log_error(g, str.format( "Issue Downloadin the following xml_link: {0}.", xml_link), Log_Details)
 
             # Step 3. Find all paths from xml form. Passing (Document, stripping url from form so says 'Return' only, Document)
             # Once this step is done we will have a list of paths and variables. 
