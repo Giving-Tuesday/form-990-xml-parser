@@ -10,7 +10,7 @@ In 2023 Giving Tuesday partnered with CitizenAudit to build:
 - A free public facing Datalake to host all past and current IRS Charity Data. 
 - A set of ongling indices cataloging all available data (hosted in the Datalake)
 
-The public data lake (files and indices) is available via AWS at arn:aws:s3:::gt990datalake-rawdata and the relevant documentation is here: [XXXXXXX]
+The public data lake (files and indices) is available via AWS at arn:aws:s3:::gt990datalake-rawdata and the relevant documentation is here: https://gt990datalake-rawdata.s3.amazonaws.com
 
 ### Part 2:  A Parser to Process Form 990 XMLs and store data into mongodb
  
@@ -18,7 +18,7 @@ This Package was designed to:
 
 - Download (or process locally available) Json indices of the IRS Form 990 Xml Files created by Giving Tuesday and hosted on the Giving Tuessday 990 Charity Datalake
 - Download Form 990 Xml Files referenced in each index (in prior step from the datalake)
-- Parse IRS Form 990 Xml Files according to the mapping of 990 variables and paths found in the 990 Concordance Files into json documents. You can learn more about the concordance files here [XXXXXX]
+- Parse IRS Form 990 Xml Files according to the mapping of 990 variables and paths found in the 990 Concordance Files into json documents (you can learn more about the concordance files in Part 6 #3 References of this readme file).
 - Store json documents into a non relational database (i.e. Mongodb).
 
 **Core Package Components**:
@@ -70,10 +70,10 @@ Step 3: Inserting JSON documents into Mongo
 ```
 Parser
 ├── Helpers   
-│   ├── Database                           
-│   │   ├── interface.py                    # Contains an interface class allowing us to load documents into mongo as well as perform other CRUD operations.
+│   ├── Database               
+│   │   ├── interface.py            # Contains an interface class allowing us to load documents into mongo as well as perform other CRUD operations.
 │   ├── Factory 
-│   │   ├── formfactory.py                  # Imports 3 classes one for each form from form.py (below) with 1 interface for mongo
+│   │   ├── formfactory.py          # Imports 3 classes one for each form from form.py (below) with 1 interface for mongo
 │   ├── Concordance_Files                   # Contains mappings
 │   │   ├── mapping.csv                     # Concordance mapping file for all non table paths/variables of form 990s
 │   │   ├── mapping_table.csv               # Concordance mapping file for all table paths/variables of form 990s
@@ -83,21 +83,21 @@ Parser
 │   ├── Model
 │   │   ├── form.py                         # Constructs 3 Classes (1 per form type 990/990ez/990pf)  with one interface per form (via interface.py), each interface contains methods to access databases 
 │   ├── Parser
-│   │   ├── formparser.py                   # Each form parser is a class object with 4 initiated variables/objects and various methods used to parse xml
-│   ├── helpers.py                          # Variety of helper methods used across library
+│   │   ├── formparser.py           # Each form parser is a class object with 4 initiated variables/objects and various methods used to parse xml
+│   ├── helpers.py              # Variety of helper methods used across library
 │   ├── index_downloader.py                 # Helper methods used to download xml indices from Giving Tuesday Datalake 
-│   ├── loggingutil.py                      # Logging library to help us log access, errors, and parser status/progress.
-├── Images                                  # Series of graphic flowcharts inserted in the README.md file below
+│   ├── loggingutil.py            # Logging library to help us log access, errors, and parser status/progress.
+├── Images                  # Series of graphic flowcharts inserted in the README.md file below
 │   ├── Picture1.png  
-│   │   ....
+│   │ ....
 │   ├── Picture5.png  
-├── Logs                                    # Storage of all logs generated during use of the script
+├── Logs                  # Storage of all logs generated during use of the script
 ├── Settings    
-│   ├── Settings.py                         # All settings used across project.  
-└── .gitignore                              # Lists files that will & will not be committed by git
-└── README.md                               # Repo readme file (i..e what you are reading now)
-└── Requirements.txt                        # Libraries required for Parser to work.
-└── XML_Parser.py                           # This file is the main script (run from the commandline) it initiates downloads, updates, and insertions of files/forms.
+│   ├── Settings.py                     # All settings used across project.  
+└── .gitignore                          # Lists files that will & will not be committed by git
+└── README.md                           # Repo readme file (i..e what you are reading now)
+└── Requirements.txt                  # Libraries required for Parser to work.
+└── XML_Parser.py                         # This file is the main script (run from the commandline) it initiates downloads, updates, and insertions of files/forms.
 ```
 
 ### Part 4. Getting Started
@@ -119,6 +119,11 @@ Parser
      - schedules_large_collection_name - name of your large schedules collection for mongodb (files greater than 16mb) 
      - mapping_main_file  - read faq below for more details
      - mapping_table_file - read faq below for more details
+   - Activate the virtual environment you created in step 3.
+  -  Via the commandline at the main repository level run the following:
+        ``` sh
+        python3 XML_Parser.py {followed by flags mentioned below}
+        ```
 
 #### Using the Parser from The Command Line
 
@@ -190,6 +195,9 @@ $ python3 XML_Parser.py -u latest_only_0001-12-21 --prod --mongodb
         - Remember to pass flags regarding location of indices local vs datalake or it will assume datalake and thus naming can fail.
     - Misconfigured Settings/settings.py
     - Missing concordance mapping files in helpers/concordance_files
+      - Mapping Concordance files are csvs that look like this: 
+          - Header Row    ----- VARIABLE_NAME,DESCRIPTION,LOCATION,XPATH
+          - Actual Record ----- AFL-PC-01-AFFLANAME1TT,Business Name Line 1,F990-PC-PART-00-SECTION-HB1B-col-a-01,Return/ReturnData/AffiliateListing/Affiliate/Name
       - You can learn more about the concordance files here:
         - https://nonprofit-open-data-collective.github.io/irs-efile-master-concordance-file/
         - https://github.com/Nonprofit-Open-Data-Collective/irs-efile-master-concordance-file
@@ -208,8 +216,12 @@ $ python3 XML_Parser.py -u latest_only_0001-12-21 --prod --mongodb
             ```sh
             $ nohup python3 XML_Parser.py -i latest_only_0001-12-21 --prod --mongodb
             ```
-    - Option 3. Use Linux Screens google for tutorials.
+    - Option 3. Use Linux Screens. Google for tutorials.
 
 
 ### Part 6. References
-
+- 1. All Publicly Available IRS Xml Files - Via IRS: https://www.irs.gov/charities-non-profits/form-990-series-downloads 
+- 2. All Publicly Available IRS Xml Files - Via Giving Tuesday: 
+- 3. Concordance/Mapping file details:
+  - https://nonprofit-open-data-collective.github.io/irs-efile-master-concordance-file/
+  - https://github.com/Nonprofit-Open-Data-Collective/irs-efile-master-concordance-file
