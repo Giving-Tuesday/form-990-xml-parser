@@ -18,18 +18,18 @@ SIZE_MAX_MONGO = mongo_max_document_size # Max size is 16mb for regular document
 ## Connect To Mongo
 try:
     # Step 1 Try Connecting To Mongo notice TLS is disabeled as are certs
-    print ("Connecting to Mongo")
+    # print ("Connecting to Mongo")
     mongodb_client = MongoClient(get_config('mongo'),connect=False)
 
 except Exception as g:
-    print ('Initial Connection Failed Trying Different Connection Approach')
+    #print ('Initial Connection Failed Trying Different Connection Approach')
     log_error(g, "Failed to connect to Mongo", Log_Details)
 
     try:
         # Step 2 Try Connecting To Mongo with TLS, Certs, etc
         mongodb_client = MongoClient(get_config('mongo'),tls=True,tlsAllowInvalidCertificates=True,connect=False)
     except Exception as gg:
-        print ("Failed to connect to Mongo")
+        #print ("Failed to connect to Mongo")
         log_error(gg, "Failed to connect to Mongo", Log_Details)
 
 ## Select/Set Appropriate Database in this case irs_xml = name of database
@@ -100,11 +100,12 @@ class MongoInterface (object):
                 'TAXYEAR': self.all_data['TAXYEAR']
             })
 
-            # Step 2 if the search results in nothing then we return None
-            return nonprofit is None
-
         except Exception as g:
+            # Step 2b if the search results in nothing then we return None
             log_error(g, "Failed to check if form does not exist", Log_Details)
+
+        # Step 2b if the search results in nothing then we return None
+        return nonprofit is None
 
     def insert_data_to_mongo(self):
 
@@ -206,7 +207,7 @@ class MongoInterface (object):
             #except:
             #    pass
         else:
-            log_progress('',str.format( "FORM FOR EIN: {0} ALREADY EXISTS IN MONGO! Skipping", self.all_data.get("FILEREIN")),Log_Details)
+            log_progress('',str.format( "FAILED FORM FOR EIN: {0} ALREADY EXISTS IN MONGO! Skipping", self.all_data.get("FILEREIN")),Log_Details)
             #print (str.format( "FORM FOR EIN: {0} ALREADY EXISTS IN MONGO!", self.all_data.get("FILEREIN")))
 
 
