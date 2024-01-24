@@ -19,7 +19,7 @@
     
     Example: 
         
-        nohup python3 ./xml_parser.py -i latest_only_2018-12-31 --prod --mongodb
+        python3 XML_Parser.py -i latest_only_2018-12-31 --prod --mongodb
     
     In the above example: 
         We use nohup to create an ouput file of anything that is printed to console. You dont need to use nohup. 
@@ -30,7 +30,7 @@
             -i insert flag for index named: latest_only_2018-12-31 
             -into production mongodb  
     
-    Final Note: You can pass more than 1 index_name via console. 
+    Final Note: You can pass more than 1 index_name via console see README.md file for more details. 
 '''
 
 import sys  # python library allows us to use sys values like from terminal

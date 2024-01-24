@@ -7,7 +7,7 @@ from helpers.helpers import get_config  # a method that gets database details de
 import pickle                           # file format for large python objects
 import os,sys                           #lets us use console and system
                                         #lets us import specific settings relating mostly to mongo
-from settings.Settings import mongo_max_document_size, mongo_database_name, schedules_reg_collection__name, schedules_large_collection_name
+from settings.Settings import mongo_max_document_size, mongo_database_name, schedules_reg_collection_name, schedules_large_collection_name
 from helpers.loggingutil import Log_Details, log_error, log_progress  # Import Custom Logging
 
 # Store name of current script in Log_Details class object as script name. We do this so that error log will always tell us which script error comes from. 
@@ -36,7 +36,7 @@ except Exception as g:
 mongo_database = mongodb_client[mongo_database_name] 
 
 ## Select Appropriate Schedules Collection Details
-schedules_collection = mongo_database[schedules_reg_collection__name]           # mongo collection that holds schedules
+schedules_collection = mongo_database[schedules_reg_collection_name]           # mongo collection that holds schedules
 schedules_collection_b = GridFS(mongo_database, schedules_large_collection_name) # mongo collection that holds schedules larger than 16mb
 
 

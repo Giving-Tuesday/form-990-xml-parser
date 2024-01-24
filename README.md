@@ -103,8 +103,22 @@ Parser
 ### Part 4. Getting Started
 
 #### Prerequirements
+  - Ensure you have Python 3.9, Pip 21, & Virtualenv installed on your computer.
+  - Ensure you have MongoDb installed locally or in a production/cloud environment
+  - Ensure you have a database setup within MongoDb (we use irs_xml as our database name)
+  - We recommend setting up 5 primary document collections within your database (we use: 990, 990EZ, 990PF, schdeules, schedulesb). 
 
-#### Setting up the parser
+#### Steps
+   - Clone this github repository
+   - Ensure you have the appropriate data folder structure. Its particularly important to have a helpers/indices and helpers/concordance_files
+   - Create a Python Virtual Environment and install all requirements.txt with pip install -r requirements.txt
+   - **Optional** Configure the following variables in settings/Settings.py: 
+     - mongo_qa_details - make sure to point to your local mongodb instance details
+     - mongo_production_details - make sure to point to your production details
+     - schedules_reg_collection_name - name of your schedules collection for mongodb 
+     - schedules_large_collection_name - name of your large schedules collection for mongodb (files greater than 16mb) 
+     - mapping_main_file  - read faq below for more details
+     - mapping_table_file - read faq below for more details
 
 #### Using the Parser from The Command Line
 
@@ -176,6 +190,9 @@ $ python3 XML_Parser.py -u latest_only_0001-12-21 --prod --mongodb
         - Remember to pass flags regarding location of indices local vs datalake or it will assume datalake and thus naming can fail.
     - Misconfigured Settings/settings.py
     - Missing concordance mapping files in helpers/concordance_files
+      - You can learn more about the concordance files here:
+        - https://nonprofit-open-data-collective.github.io/irs-efile-master-concordance-file/
+        - https://github.com/Nonprofit-Open-Data-Collective/irs-efile-master-concordance-file
 - User wants to leave parser running. 
     - Option 1. 
         - For Windows user use:  python3w filename.py the 'w' after Python tells interpreter to run code in background
