@@ -108,9 +108,9 @@ Parser
   - Ensure you have a database setup within MongoDb (we use irs_xml as our database name)
   - We recommend setting up 5 primary document collections within your database (we use: 990, 990EZ, 990PF, schdeules, schedulesb). 
 
-#### Steps
+#### Installation Steps
    - Clone this github repository
-   - Ensure you have the appropriate data folder structure. Its particularly important to have a helpers/indices and helpers/concordance_files
+   - Ensure you have the appropriate data folder structure. Its particularly important to have the following folders: helpers/indices and helpers/concordance_files and /logs.
    - Create a Python Virtual Environment and install all requirements.txt with pip install -r requirements.txt
    - **Optional** Configure the following variables in settings/Settings.py: 
      - mongo_qa_details - make sure to point to your local mongodb instance details
@@ -123,6 +123,33 @@ Parser
   -  Via the commandline at the main repository level run the following:
         ``` sh
         python3 XML_Parser.py {followed by flags mentioned below}
+        ```
+
+#### Testing Steps via commandline do the following:
+   - Log in to your mongo deployment  
+        ``` sh
+        mongosh
+        ```
+   - Select database to test 
+        ``` sh
+        use irs_xml
+        ```
+   - View Document Counts Per Collection
+        ``` sh
+        db['990'].countDocuments()
+        db['990EZ'].countDocuments()
+        db['990PF'].countDocuments()
+        ```
+   - Across all 4 sample indices there should be the following counts: 
+        - #20 Form 990s
+        - #14 Form 990ezs
+        - #05 Form 990pfs
+
+   - View Specific Document
+        ``` sh
+        db['990'].find({"FILEREIN:942668057"})
+        db['990EZ'].find({"FILEREIN:80639587"})
+        db['990PF'].find({"FILEREIN:873700196"})
         ```
 
 #### Using the Parser from The Command Line
@@ -164,31 +191,31 @@ $ python3 XML_Parser.py -i latest_only_0001-12-21 --gtdatalake --qa --mongodb
 - Insert xmls from the latest_only_0001-12-21.json index into qa mongodb. Insert only 100 documents at a time.
 
 ```sh
-$ python3 XML_Parser.py -i latest_only_0001-12-21 -l 100 --qa --mongodb
+$ python3 XML_Parser.py -i latest_only_0001-12-21 --gtdatalake -l 100 --qa --mongodb
 ```
 
 - Insert xmls from the latest_only_0001-12-21.json index using force insert - by deleting and reinserting the data (file by file) into production mongodb.
 
 ```sh
-$ python3 XML_Parser.py -i latest_only_0001-12-21 -f --prod --mongodb
+$ python3 XML_Parser.py -i latest_only_0001-12-21 --gtdatalake -f --prod --mongodb
 ```
 
 - Insert xmls from the latest_only_0001-12-21.json continuing from position 20 in the latest_only_0001-12-21.json index into production mongodb.
 
 ```sh
-$ python3 XML_Parser.py -i latest_only_0001-12-21 -c 20 --prod --mongodb
+$ python3 XML_Parser.py -i latest_only_0001-12-21 --gtdatalake -c 20 --prod --mongodb
 ```
 
 - Insert multiple indices latest_only_0000-12-21 and latest_only_0001-12-21 into production monogodb.
 
 ```sh
-$ python3 XML_Parser.py -i latest_only_0000-12-21.json latest_only_0001-12-21.json --prod --mongodb
+$ python3 XML_Parser.py -i latest_only_0000-12-21.json latest_only_0001-12-21.json --gtdatalake --prod --mongodb
 ```
 
 - Process updated index latest_only_0001-12-21.json into production mongodb. For example presume index latest_only_0001-12-21.json has been updated, or modified. We need to then process and insert any new files into mongodb. 
 
 ```sh
-$ python3 XML_Parser.py -u latest_only_0001-12-21 --prod --mongodb
+$ python3 XML_Parser.py -u latest_only_0001-12-21 --gtdatalake --prod --mongodb
 ```
 
 ### Part 5. FAQ & Troubleshooting
@@ -252,16 +279,16 @@ $ python3 XML_Parser.py -u latest_only_0001-12-21 --prod --mongodb
     - Option 1. 
         - For Windows user use:  python3w filename.py the 'w' after Python tells interpreter to run code in background
             ```sh
-            $ python3w XML_Parser.py -i latest_only_0001-12-21 --qa --mongodb
+            $ python3w XML_Parser.py -i latest_only_0001-12-21 --gtdatalake --qa --mongodb
             ```
         - For Linux or mac users use: python3 filename.py &  Note: the "&"" sign will tell interpreter to run in background
             ```sh
-            $ python3 XML_Parser.py & -i latest_only_0001-12-21 --prod --mongodb
+            $ python3 XML_Parser.py & -i latest_only_0001-12-21 --gtdatalake --prod --mongodb
             ```
     - Option 2.  
         - Use nohup which means dont terminate process when we logout of ssh or terminal session (there will be a nohup.out file created)
             ```sh
-            $ nohup python3 XML_Parser.py -i latest_only_0001-12-21 --prod --mongodb
+            $ nohup python3 XML_Parser.py -i latest_only_0001-12-21 --gtdatalake --prod --mongodb
             ```
     - Option 3. Use Linux Screens. Google for tutorials.
 
