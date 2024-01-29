@@ -79,7 +79,9 @@ Parser
 │   │   ├── mapping_table.csv               # Concordance mapping file for all table paths/variables of form 990s
 │   ├── Indices
 │   │   ├── latest_only_0000-12-21.json     # Small sample index file for testing/debugging purposes
-│   │   ├── latest_only_0000-12-21.json     # Small sample index file for testing/debugging purposes
+│   │   ├── latest_only_0001-12-21.json     # Small sample index file for testing/debugging purposes
+│   │   ├── latest_only_0003-12-21.json     # Small sample index file for testing/debugging purposes
+│   │   ├── latest_only_0003-12-21.json     # Small sample index file for testing/debugging purposes
 │   ├── Model
 │   │   ├── form.py                         # Constructs 3 Classes (1 per form type 990/990ez/990pf)  with one interface per form (via interface.py), each interface contains methods to access databases 
 │   ├── Parser
