@@ -149,9 +149,9 @@ Parser
 
    - View Specific Document
         ``` sh
-        db['990'].find({"FILEREIN:942668057"})
-        db['990EZ'].find({"FILEREIN:80639587"})
-        db['990PF'].find({"FILEREIN:873700196"})
+        db['990'].find({"FILEREIN":"942668057"})
+        db['990EZ'].find({"FILEREIN":"80639587"})
+        db['990PF'].find({"FILEREIN":"873700196"})
         ```
 
 #### Using the Parser from The Command Line
