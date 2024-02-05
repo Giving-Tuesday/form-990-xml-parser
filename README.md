@@ -306,7 +306,7 @@ $ python3 XML_Parser.py -u latest_only_0001-12-21 --gtdatalake --prod --mongodb
 
 This library was created by Miguel Barbosa at CitizenAudit.org in collaboration with Giving Tuesday.
 
-### Licensing TBD
+### Licensing
 
 Copyright 2024 CitizenAudit.Org Inc & Giving Tuesday
 
