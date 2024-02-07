@@ -1,2 +1,0 @@
-2024-01-24 00:38:51,420 - access - INFO - Script: XML_Parser.py - Message: Started Running The XML Parser with following arguments & flags: -i latest_only_0000-12-21 --local --qa --mongodb
-2024-01-24 00:39:22,671 - access - INFO - Script: XML_Parser.py - Message: Started Running The XML Parser with following arguments & flags: -i latest_only_0000-12-21 --local --qa --mongodb
