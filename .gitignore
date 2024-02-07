@@ -1,0 +1,7 @@
+#helpers/indices/*.json
+helpers/.DS_Store
+*.DS_Store
+*.out
+*.pyc
+*.pickle
+env
