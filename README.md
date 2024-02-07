@@ -6,7 +6,7 @@ Every year all charities in the United States must file their annual tax returns
 
 Form 990s are considered public documents (i.e. open for public inspection) and the IRS releases these efiled forms as XML files on the IRS website https://www.irs.gov/charities-non-profits/form-990-series-downloads
 
-In 2023 Giving Tuesday partnered with CitizenAudit to build:
+In 2023 GivingTuesday partnered with CitizenAudit to build:
 - A free public facing Datalake to host all past and current IRS Charity Data. 
 - A set of ongling indices cataloging all available data (hosted in the Datalake)
 
@@ -16,7 +16,7 @@ The public data lake (files and indices) is available via AWS at arn:aws:s3:::gt
  
 This Package was designed to:
 
-- Download (or process locally available) Json indices of the IRS Form 990 Xml Files created by Giving Tuesday and hosted on the Giving Tuessday 990 Charity Datalake
+- Download (or process locally available) Json indices of the IRS Form 990 Xml Files created by GivingTuesday and hosted on the Giving Tuessday 990 Charity Datalake
 - Download Form 990 Xml Files referenced in each index (in prior step from the datalake)
 - Parse IRS Form 990 Xml Files according to the mapping of 990 variables and paths found in the 990 Concordance Files into json documents (you can learn more about the concordance files in Part 6 #3 References of this readme file).
 - Store json documents into a non relational database (i.e. Mongodb).
@@ -28,7 +28,7 @@ This Package was designed to:
 
 Visual overview of parser steps (outlined above):
 
-Step 1: Downloading & Storing Index from Giving Tuesday Data Lake
+Step 1: Downloading & Storing Index from GivingTuesday Data Lake
 
 ![Alt text](images/Picture1.png "Donwload Index")
 
@@ -87,7 +87,7 @@ Parser
 │   ├── Parser
 │   │   ├── formparser.py                   # Each form parser is a class object with 4 initiated variables/objects and various methods used to parse xml
 │   ├── helpers.py                          # Variety of helper methods used across library
-│   ├── index_downloader.py                 # Helper methods used to download xml indices from Giving Tuesday Datalake 
+│   ├── index_downloader.py                 # Helper methods used to download xml indices from GivingTuesday Datalake 
 │   ├── loggingutil.py                      # Logging library to help us log access, errors, and parser status/progress.
 ├── Images                                  # Series of graphic flowcharts inserted in the README.md file below
 │   ├── Picture1.png  
@@ -160,11 +160,11 @@ Parser commands that can be passed from command line/terminal:
 
 | Command        | Description                                                            | Default     |
 | -------------- | ---------------------------------------------------------------------- | ----------- |
-| -i {IndexName}      |Note: Json file names from Giving Tuesday Datalake must follow one of the following | ----------- |
+| -i {IndexName}      |Note: Json file names from GivingTuesday Datalake must follow one of the following | ----------- |
 | |all_years_{year}-{month}-{date} json file extension is not needed|-----------|
 | |latest_only_{year}-{month}-{date} json file extension is not needed|-----------|
 | --local| Index from -i command is available locally in helpers/indices/ |-----------|
-| --gtdatalake| Index from -i command is to be downloaded from giving tuesday datalake | gtdatalake|
+| --gtdatalake| Index from -i command is to be downloaded from GivingTuesday datalake | gtdatalake|
 | -f             | When processing removes and insert forms versus just inserting         | ----------- |
 | -l {Number}    | Number of forms that will be inserted simultaneously                   | 1000        |
 | -c {Number}    | Location from an index where you want to continue inserting/processing | ----------- |
@@ -184,7 +184,7 @@ Note: We have included several sample indices in the helpers/indices folder for 
 $ python3 XML_Parser.py -i latest_only_0000-12-21 --local --prod --mongodb
 ```
 
-- Insert xmls from the latest_only_0001-12-21.json index via giving tuesday datalake into qa mongodb.
+- Insert xmls from the latest_only_0001-12-21.json index via GivingTuesday datalake into qa mongodb.
 
 ```sh
 $ python3 XML_Parser.py -i latest_only_0001-12-21 --gtdatalake --qa --mongodb 
@@ -297,21 +297,11 @@ $ python3 XML_Parser.py -u latest_only_0001-12-21 --gtdatalake --prod --mongodb
 
 ### Part 6. References
 - 1. All Publicly Available IRS Xml Files - Via IRS: https://www.irs.gov/charities-non-profits/form-990-series-downloads 
-- 2. All Publicly Available IRS Xml Files - Via Giving Tuesday: 
+- 2. All Publicly Available IRS Xml Files - Via GivingTuesday: 
 - 3. Concordance/Mapping file details:
   - https://nonprofit-open-data-collective.github.io/irs-efile-master-concordance-file/
   - https://github.com/Nonprofit-Open-Data-Collective/irs-efile-master-concordance-file
 
 ### Acknowledgements 
 
-This library was created by Miguel Barbosa at CitizenAudit.org in collaboration with Giving Tuesday.
-
-### Licensing
-
-Copyright 2024 CitizenAudit.Org Inc & Giving Tuesday
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+This library was created by Miguel Barbosa at CitizenAudit.org in collaboration with GivingTuesday.
